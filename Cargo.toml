@@ -1,0 +1,11 @@
+[package]
+name = "androidtest"
+version = "0.1.0"
+build = "build.rs"
+authors = ["TheNappap <mathijs.delabie@student.kuleuven.be>"]
+
+[dependencies.sdl2]
+version = "*"
+
+[dependencies.cgmath]
+version = "*"
