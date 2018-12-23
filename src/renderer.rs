@@ -23,11 +23,11 @@ fn default_camera() -> PerspectiveCamera
 fn default_scene() -> SceneGraph{
     let mut scene_graph = SceneGraph::new();
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(0.0, 0.0, 2.0)), Box::new(Lambertian::new(Color::new(1.0,0.0, 0.0))) )));
-    scene_graph.add_object(Box::new(Sphere::new(Transformation::new().scale_all(1.5).translate(Vector::new(2.0, 0.0, 3.0)),Box::new(Lambertian::new(Color::new(0.0,1.0, 1.0))) )));
+    scene_graph.add_object(Box::new(Sphere::new(Transformation::new().scale(2.0, 1.0, 1.0).translate(Vector::new(2.0, 0.0, 3.0)),Box::new(Lambertian::new(Color::new(0.0,1.0, 1.0))) )));
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(-2.0, 0.0, 3.0)),Box::new(Lambertian::new(Color::gray(0.50))) )));
     scene_graph.add_object(Box::new(Plane::new(Transformation::new().translate(Vector::new(0.0, -1.0, 0.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
     scene_graph.add_object(Box::new(Rectangle::new(Point::new(2.0, 0.0, 2.0), Transformation::new().rotate(RotationAxis::Xaxis, -FRAC_PI_2).translate(Vector::new(0.0, 0.0, 3.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
-    scene_graph.add_object(Box::new(BoxObject::new(Point::new(1.0, 1.0, 1.0), Transformation::new().translate(Vector::new(1.0, -0.5, 1.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
+    scene_graph.add_object(Box::new(BoxObject::new(Point::new(1.0, 1.0, 1.0), Transformation::new().translate(Vector::new(-4.0, 2.0, 3.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
 
     let position = super::math::Point::new(0.0,8.0,0.0);
     let position2 = super::math::Point::new(-2.0,2.0,0.0);

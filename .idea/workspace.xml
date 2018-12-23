@@ -5,7 +5,102 @@
     <bookmark url="file://$PROJECT_DIR$/src/math/matrix.rs" line="83" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cdb8c5a3-d4cc-4582-9c7f-6ede52ab79ce" name="Default" comment="" />
+    <list default="true" id="cdb8c5a3-d4cc-4582-9c7f-6ede52ab79ce" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/src/math/matrix.rs" afterPath="$PROJECT_DIR$/src/math/matrix.rs" />
+      <change beforePath="$PROJECT_DIR$/src/primitives.rs" afterPath="$PROJECT_DIR$/src/primitives.rs" />
+      <change beforePath="$PROJECT_DIR$/src/renderer.rs" afterPath="$PROJECT_DIR$/src/renderer.rs" />
+      <change beforePath="$PROJECT_DIR$/target/debug/.fingerprint/androidtest-705f4be3657b57a7/build" afterPath="$PROJECT_DIR$/target/debug/.fingerprint/androidtest-705f4be3657b57a7/build" />
+      <change beforePath="$PROJECT_DIR$/target/debug/.fingerprint/androidtest-705f4be3657b57a7/build.json" afterPath="$PROJECT_DIR$/target/debug/.fingerprint/androidtest-705f4be3657b57a7/build.json" />
+      <change beforePath="$PROJECT_DIR$/target/debug/.fingerprint/androidtest-acead52673ab5d4e/bin-androidtest-acead52673ab5d4e" afterPath="$PROJECT_DIR$/target/debug/.fingerprint/androidtest-acead52673ab5d4e/bin-androidtest-acead52673ab5d4e" />
+      <change beforePath="$PROJECT_DIR$/target/debug/.fingerprint/androidtest-acead52673ab5d4e/bin-androidtest-acead52673ab5d4e.json" afterPath="$PROJECT_DIR$/target/debug/.fingerprint/androidtest-acead52673ab5d4e/bin-androidtest-acead52673ab5d4e.json" />
+      <change beforePath="$PROJECT_DIR$/target/debug/androidtest.exe" afterPath="$PROJECT_DIR$/target/debug/androidtest.exe" />
+      <change beforePath="$PROJECT_DIR$/target/debug/deps/androidtest-acead52673ab5d4e.exe" afterPath="$PROJECT_DIR$/target/debug/deps/androidtest-acead52673ab5d4e.exe" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/10s0kfndtxw3am1p.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/14xftj2afen7w5qf.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/15rx3jyv758yoncf.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/18pfmezxfbhw5gbc.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/1at9ltkwjujbjyoh.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/1dhmux6a2m005hqh.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/1jmjuxy3nzx7kgpg.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/1kjagbefzvxopbwb.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/1siz6hldmzp7plja.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/1tjm7g4hi734w2xg.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/1trpt7ezspkjwlom.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/1u7u0s1jutiu00y0.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/1wi00894vvi7j7wq.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/1ystlfsf5uhpe5k0.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/220oc3pghahrj1dc.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/23pbufcgqetkx5b6.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2ahfia1cy36czs5d.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2fdm2muibkpy4af2.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2la4u83begaghkfy.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2lrrons53pm69pwj.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2mlxy779eczmehdv.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2n9tox4titrzgtrk.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2nrp50rpl28ahtqt.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2tpg7lhbijdo8a07.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2u5hvve4qepvf7f0.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2vzzn7yurg13fj65.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2x7w7o23qqa6hvhr.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/2z7zo8kih4zy3xvc.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/31nv6yh898ae0rj9.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/34gk1t5i6mbxn0q6.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/35gap8ic75q8kagw.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/35m6w6efh5sb5nm9.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3823rn3m118u1hih.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3ajfkhftc9h1x6z9.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3akp71ezmksx4rc9.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3ejvytqgjzixevph.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3emvpfqaj5s1tgn5.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3eq6oouemnv0gkh1.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3ik2xu2jiero31hl.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3imrseh2yqu0nmnz.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3oaw2ugg38as40il.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3ocr9oov1hhmmhoc.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3ors7pyt7mxwrkzb.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3owop7zw3dw16rvf.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/3z7y976lxxeyoyuj.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/440gm3c6f94mpg9z.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/44tmg8vl7j57lt4m.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/49hvrxzvbl5zc7vh.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4c0hq8t73s5ham5k.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4ck2y7eobf8m6ox9.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4gpx6dzde5bmx4o9.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4gqi5rl56fm3n8ib.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4ijnxuj275i07dya.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4kak8btb8jdilwz0.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4lt02tdkucgq5a90.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4m74bw873oh0j892.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4n9bci7yesa5vcq4.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4o87nhhy3r32shwi.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4pegtnuq5p2dj41a.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4v9fq8stffbmehmg.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4xrpmkmicq9w5u7.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/4y7n2j2hdyzkweyx.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/53df6ulwr8s3nc44.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/55nb813glbyl6bfv.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/59s5w40384ljzs1v.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/59u2kkj8807rgen5.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/5an59tnk1kxxz4fy.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/5c5je7eyfmf3ds49.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/5g7qja0duagd5lp7.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/5gr4szh41trzhe1f.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/6zgzynb0pttprkf.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/78wdd2crq33e06y.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/dep-graph.bin" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/f7rucxb1nwk1gid.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/jn4m5tmj90xbs30.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/jwszxi0au6ml8nb.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/n2d7clbp45u2qv.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/ntcl8ttpmdy0vif.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/query-cache.bin" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/t1jlygevtnex215.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/uoqduvvz6col60u.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/work-products.bin" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r-3dgc6t3o4766v/xts10sql099g7e0.o" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/target/debug/incremental/androidtest-3uw9hjvoxqd1d/s-f7v0ldxspe-1tg5f9r.lock" afterPath="" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -18,11 +113,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="renderer.rs" pinned="false" current-in-tab="false">
+      <file leaf-file-name="renderer.rs" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/renderer.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="24" column="4" lean-forward="false" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
+            <state relative-caret-position="391">
+              <caret line="29" column="129" lean-forward="false" selection-start-line="29" selection-start-column="129" selection-end-line="29" selection-end-column="129" />
               <folding />
             </state>
           </provider>
@@ -51,8 +146,8 @@
       <file leaf-file-name="matrix.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/math/matrix.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
-              <caret line="68" column="22" lean-forward="false" selection-start-line="68" selection-start-column="22" selection-end-line="68" selection-end-column="22" />
+            <state relative-caret-position="102">
+              <caret line="6" column="31" lean-forward="false" selection-start-line="6" selection-start-column="31" selection-end-line="6" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -61,8 +156,8 @@
       <file leaf-file-name="transformation.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/math/transformation.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="87">
-              <caret line="17" column="11" lean-forward="false" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
+            <state relative-caret-position="204">
+              <caret line="17" column="37" lean-forward="false" selection-start-line="17" selection-start-column="37" selection-end-line="17" selection-end-column="37" />
               <folding>
                 <element signature="e#725#726#0" expanded="true" />
                 <element signature="e#769#770#0" expanded="true" />
@@ -74,8 +169,8 @@
       <file leaf-file-name="scene.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/scene.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1156">
-              <caret line="74" column="11" lean-forward="false" selection-start-line="74" selection-start-column="11" selection-end-line="74" selection-end-column="11" />
+            <state relative-caret-position="204">
+              <caret line="31" column="66" lean-forward="false" selection-start-line="31" selection-start-column="66" selection-end-line="31" selection-end-column="66" />
               <folding>
                 <element signature="e#271#272#0" expanded="true" />
                 <element signature="e#337#338#0" expanded="true" />
@@ -98,14 +193,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="primitives.rs" pinned="false" current-in-tab="true">
+      <file leaf-file-name="primitives.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/primitives.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="403">
-              <caret line="55" column="29" lean-forward="false" selection-start-line="55" selection-start-column="29" selection-end-line="55" selection-end-column="29" />
+            <state relative-caret-position="425">
+              <caret line="200" column="10" lean-forward="false" selection-start-line="200" selection-start-column="10" selection-end-line="200" selection-end-column="10" />
               <folding>
-                <element signature="e#1957#1958#0" expanded="true" />
-                <element signature="e#1994#1995#0" expanded="true" />
+                <element signature="e#1973#1974#0" expanded="true" />
+                <element signature="e#2010#2011#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -138,6 +233,9 @@
       <find>Direction</find>
     </findStrings>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="GradleLocalSettings">
     <option name="externalProjectsViewState">
       <projects_view />
@@ -159,12 +257,12 @@
         <option value="$PROJECT_DIR$/src/camera.rs" />
         <option value="$PROJECT_DIR$/src/math/utils.rs" />
         <option value="$PROJECT_DIR$/src/lights.rs" />
-        <option value="$PROJECT_DIR$/src/math/transformation.rs" />
         <option value="$PROJECT_DIR$/src/math/mod.rs" />
         <option value="$PROJECT_DIR$/src/scene.rs" />
-        <option value="$PROJECT_DIR$/src/renderer.rs" />
+        <option value="$PROJECT_DIR$/src/math/transformation.rs" />
         <option value="$PROJECT_DIR$/src/math/matrix.rs" />
         <option value="$PROJECT_DIR$/src/primitives.rs" />
+        <option value="$PROJECT_DIR$/src/renderer.rs" />
       </list>
     </option>
   </component>
@@ -173,6 +271,7 @@
     <option name="width" value="943" />
     <option name="height" value="1087" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
@@ -374,7 +473,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32624114" sideWeight="0.5446717" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32624114" sideWeight="0.45532832" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -449,8 +548,8 @@
         <state relative-caret-position="170">
           <caret line="10" column="39" lean-forward="false" selection-start-line="10" selection-start-column="39" selection-end-line="10" selection-end-column="39" />
           <folding>
-            <element signature="e#1957#1958#0" expanded="true" />
-            <element signature="e#1994#1995#0" expanded="true" />
+            <element signature="e#1973#1974#0" expanded="true" />
+            <element signature="e#2010#2011#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -491,8 +590,8 @@
         <state relative-caret-position="187">
           <caret line="11" column="13" lean-forward="false" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
           <folding>
-            <element signature="e#1957#1958#0" expanded="true" />
-            <element signature="e#1994#1995#0" expanded="true" />
+            <element signature="e#1973#1974#0" expanded="true" />
+            <element signature="e#2010#2011#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -728,6 +827,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
           <caret line="33" column="11" lean-forward="false" selection-start-line="33" selection-start-column="11" selection-end-line="33" selection-end-column="11" />
+          <folding>
+            <element signature="e#256#257#0" expanded="false" />
+            <element signature="e#295#296#0" expanded="false" />
+            <element signature="e#334#335#0" expanded="false" />
+            <element signature="e#379#380#0" expanded="false" />
+            <element signature="e#429#430#0" expanded="false" />
+            <element signature="e#456#457#0" expanded="false" />
+            <element signature="e#1101#1102#0" expanded="false" />
+            <element signature="e#1133#1134#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -788,8 +897,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/scene.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1156">
-          <caret line="74" column="11" lean-forward="false" selection-start-line="74" selection-start-column="11" selection-end-line="74" selection-end-column="11" />
+        <state relative-caret-position="204">
+          <caret line="31" column="66" lean-forward="false" selection-start-line="31" selection-start-column="66" selection-end-line="31" selection-end-column="66" />
           <folding>
             <element signature="e#271#272#0" expanded="true" />
             <element signature="e#337#338#0" expanded="true" />
@@ -803,8 +912,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/math/transformation.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="87">
-          <caret line="17" column="11" lean-forward="false" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
+        <state relative-caret-position="204">
+          <caret line="17" column="37" lean-forward="false" selection-start-line="17" selection-start-column="37" selection-end-line="17" selection-end-column="37" />
           <folding>
             <element signature="e#725#726#0" expanded="true" />
             <element signature="e#769#770#0" expanded="true" />
@@ -814,28 +923,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/math/matrix.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="68" column="22" lean-forward="false" selection-start-line="68" selection-start-column="22" selection-end-line="68" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/renderer.rs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="24" column="4" lean-forward="false" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
+        <state relative-caret-position="102">
+          <caret line="6" column="31" lean-forward="false" selection-start-line="6" selection-start-column="31" selection-end-line="6" selection-end-column="31" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/primitives.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="403">
-          <caret line="55" column="29" lean-forward="false" selection-start-line="55" selection-start-column="29" selection-end-line="55" selection-end-column="29" />
+        <state relative-caret-position="425">
+          <caret line="200" column="10" lean-forward="false" selection-start-line="200" selection-start-column="10" selection-end-line="200" selection-end-column="10" />
           <folding>
-            <element signature="e#1957#1958#0" expanded="true" />
-            <element signature="e#1994#1995#0" expanded="true" />
+            <element signature="e#1973#1974#0" expanded="true" />
+            <element signature="e#2010#2011#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/renderer.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="29" column="129" lean-forward="false" selection-start-line="29" selection-start-column="129" selection-end-line="29" selection-end-column="129" />
+          <folding />
         </state>
       </provider>
     </entry>

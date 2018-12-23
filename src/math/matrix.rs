@@ -4,7 +4,7 @@ use std::fmt;
 
 use super::{VectorTrait, Point, Vector};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct Matrix {
     base: [[f64; 4]; 4]
 }
@@ -66,7 +66,7 @@ impl Matrix {
         self.base[n][m]
     }
 
-    pub fn transpose(&mut self) -> &Matrix {
+    pub fn transpose(mut self) -> Matrix {
         let swap = |base: &mut [[f64; 4]; 4], i: usize, j: usize| {
             let value = base[i][j];
             base[i][j] = base[j][i];

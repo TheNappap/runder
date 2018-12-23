@@ -53,10 +53,10 @@ impl Object for Sphere {
             t = -b/(2.0*a);
         }
 
-        println!("t: {}", t);
         if t > 0.0 {
-            let point = self.transformation.matrix()*(origin + t*direction);
-            let normal = self.transformation.matrix()*(point - center).normalize();
+            let point = origin + t*direction;
+            let normal = (&self.transformation.inverted().transpose()*(point - center)).normalize();
+            let point = self.transformation.matrix()*point;
             Some( Intersection::new(t, point, normal, self.material()) )
         }
             else { None }
@@ -98,7 +98,9 @@ impl Object for Plane {
         else {
             let t = -denom/nom;
             if t == 0.0 { return None }
-            let point = self.transformation.matrix()*(origin + t*direction);
+            let point = origin + t*direction;
+            let normal = (&self.transformation.inverted().transpose()*normal).normalize();
+            let point = self.transformation.matrix()*point;
             let int = Intersection::new(t, point, normal, self.material());
             Some(int)
         }
@@ -197,8 +199,8 @@ impl Object for BoxObject {
             (t,_) if t == tzmin => Normal::new(0.0,0.0,1.0),
             _ => Normal::new(0.0,0.0,0.0)
         };
+        let normal = (&self.transformation.inverted().transpose()*normal).normalize();
         let point = self.transformation.matrix()*point;
-        let normal = self.transformation.matrix()*normal;
         let int = Intersection::new(t, point, normal, self.material());
         Some(int)
     }
