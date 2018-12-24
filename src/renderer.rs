@@ -116,6 +116,7 @@ fn run_program_loop(width : i32, height : i32){
         .unwrap();
 
     let mut canvas = window.into_canvas().build().unwrap();
+    canvas.present();
 
     let (sender, receiver) = mpsc::channel();
     std::thread::spawn( move || {

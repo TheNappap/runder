@@ -5,7 +5,7 @@ use math::{VectorTrait, Normal, Direction, Point, Radiance};
 use primitives::{Object, Rectangle};
 use material::Color;
 use scene::{SceneGraph, Intersection};
-use sampling;
+use sampling::{self, SamplingTechnique};
 
 pub trait Light : Send + Sync{
     fn light_points(&self) -> Vec<(Point,Option<Normal>)>;
@@ -51,15 +51,12 @@ impl SurfaceLight {
 impl Light for SurfaceLight {
     fn light_points(&self) -> Vec<(Point, Option<Normal>)> {
         let normal: Option<Normal> = Some( (self.surface.transformation().inverted().transpose() * Normal::new(0.0, 1.0, 0.0)).normalize() );
-        let amt_samples = 64 as usize;
+        let amt_samples = 4 as usize;
 
-        let mut vec = Vec::new();
-        for _ in 0..amt_samples {
-            let (u,v) = sampling::sample_rect(1.0,1.0);
+        sampling::sample_rect(1.0,1.0, SamplingTechnique::Stratified {seed: 0.0}, 8).iter().map(|(u, v) |{
             let point = *self.surface.transformation().matrix()*(Point::new(self.surface.corner_point().x()*u, 0.0, self.surface.corner_point().z()*v));
-            vec.push((point,normal));
-        }
-        vec
+            (point, normal)
+        }).collect()
     }
 
     fn radiance_from_point(&self, _: Point) -> Radiance {
