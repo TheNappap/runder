@@ -9,3 +9,6 @@ version = "*"
 
 [dependencies.cgmath]
 version = "*"
+
+[dependencies.rand]
+version = "*"

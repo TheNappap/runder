@@ -29,13 +29,14 @@ impl SceneGraph {
             .fold(None, Intersection::closest_intersection)
     }
 
-    pub fn visible(&self, point: Point, from: Direction) -> bool {
-        let distance = from.length();
-        let ray = Ray::new(point, from);
+    pub fn visible(&self, from: Point, to: Point) -> bool {
+        let dir = (to - from).normalize();
+        let distance = dir.length();
+        let ray = Ray::new(from, dir);
         for object in &self.objects {
             let opt_int = object.intersect( &ray );
             if let Some(intersect) = opt_int {
-                let dist = (intersect.point() - point).length();
+                let dist = (intersect.point() - from).length();
                 if dist < distance { return false; }
             }
         }
@@ -45,14 +46,27 @@ impl SceneGraph {
     pub fn receive_radiance(&self, intersection: Intersection, outgoing: Direction) -> Radiance{
         let mut radiance = Radiance::zero();
         for light in &self.lights {
-            let (rad, incoming) =  light.receive_radiance(&intersection.point, &intersection.normal);
-            let visible = self.visible(intersection.point + 1.0e-12*intersection.normal(), incoming);
-            if !visible { continue; }
+            let mut rad = Radiance::zero();
+            let light_points = light.light_points();
+            let amount = light_points.len();
+            for (light_point, opt_normal) in light_points{
+                let incoming = (light_point - intersection.point()).normalize();
+                let light_normal = match opt_normal { Some(n) => n, None => incoming.invert() };
 
-            let cos = intersection.normal.dot(&incoming.normalize());
-            let rad = if cos <= 0.0 { Radiance::zero() }
-                                else { cos*rad.apply_color(intersection.material.brdf(incoming, outgoing)) };
-            radiance = radiance + rad;
+                let visible = self.visible(intersection.point() + 1.0e-12*intersection.normal(), light_point + 1.0e-12*light_normal);
+                if !visible { continue }
+
+                let r = (light_point - intersection.point()).length();
+                let cos_point = intersection.normal().dot(&incoming).max(0.0);
+                let cos_light = light_normal.dot(&incoming.invert()).max(0.0);
+
+                let factor = (cos_point*cos_light)/(r*r);
+                let rad_from_light = light.radiance_from_point(light_point);
+                let brdf = intersection.material.brdf(incoming, outgoing);
+                rad = rad + factor*rad_from_light.apply_color(brdf);
+            }
+
+            radiance = radiance + rad*(1.0/amount as f64);
         }
         radiance
     }

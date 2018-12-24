@@ -27,7 +27,7 @@ impl Sphere {
 impl Object for Sphere {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         let center = Point::origin();
-        let (origin, direction) = (self.transformation.inverted()*ray.origin(), self.transformation.inverted()*ray.direction());
+        let (origin, direction) = (*self.transformation.inverted()*ray.origin(), *self.transformation.inverted()*ray.direction());
 
         let moved_origin = origin - center;
         let a = direction.dot(&direction);
@@ -55,8 +55,8 @@ impl Object for Sphere {
 
         if t > 0.0 {
             let point = origin + t*direction;
-            let normal = (&self.transformation.inverted().transpose()*(point - center)).normalize();
-            let point = self.transformation.matrix()*point;
+            let normal = (self.transformation.inverted().transpose()*(point - center)).normalize();
+            let point = *self.transformation.matrix()*point;
             Some( Intersection::new(t, point, normal, self.material()) )
         }
             else { None }
@@ -88,7 +88,7 @@ impl Object for Plane {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         let point_in_plane = Point::origin();
         let normal = Normal::new(0.0,1.0,0.0);
-        let (origin, direction) = (self.transformation.inverted()*ray.origin(), self.transformation.inverted()*ray.direction());
+        let (origin, direction) = (*self.transformation.inverted()*ray.origin(), *self.transformation.inverted()*ray.direction());
 
         let nom = direction.invert().dot(&normal);
         let denom = (point_in_plane - origin).dot(&normal);
@@ -99,8 +99,8 @@ impl Object for Plane {
             let t = -denom/nom;
             if t == 0.0 { return None }
             let point = origin + t*direction;
-            let normal = (&self.transformation.inverted().transpose()*normal).normalize();
-            let point = self.transformation.matrix()*point;
+            let normal = (self.transformation.inverted().transpose()*normal).normalize();
+            let point = *self.transformation.matrix()*point;
             let int = Intersection::new(t, point, normal, self.material());
             Some(int)
         }
@@ -124,12 +124,14 @@ impl Rectangle{
     pub fn new(corner_point: Point, transformation: Transformation, material: Box<Material>) -> Rectangle{
         Rectangle{ plane: Plane{transformation, material}, corner_point}
     }
+
+    pub fn corner_point(&self) -> Point { self.corner_point }
 }
 
 impl Object for Rectangle {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         if let Some(intersect) = self.plane.intersect(ray){
-            let point = self.transformation().inverted()*intersect.point();
+            let point = *self.transformation().inverted()*intersect.point();
 
             if point.x() >= 0.0 && point.z() >= 0.0 && point.x() <= intersect.point().x() && point.z() <= intersect.point().z() {
                 return Some(intersect);
@@ -161,7 +163,7 @@ impl BoxObject{
 
 impl Object for BoxObject {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
-        let (origin, direction) = (self.transformation.inverted()*ray.origin(), self.transformation.inverted()*ray.direction());
+        let (origin, direction) = (*self.transformation.inverted()*ray.origin(), *self.transformation.inverted()*ray.direction());
         let mut txmin = (0.0 - origin.x()) / direction.x();
         let mut txmax = (self.corner_point.x() - origin.x()) / direction.x();
 
@@ -199,8 +201,8 @@ impl Object for BoxObject {
             (t,_) if t == tzmin => Normal::new(0.0,0.0,1.0),
             _ => Normal::new(0.0,0.0,0.0)
         };
-        let normal = (&self.transformation.inverted().transpose()*normal).normalize();
-        let point = self.transformation.matrix()*point;
+        let normal = (self.transformation.inverted().transpose()*normal).normalize();
+        let point = *self.transformation.matrix()*point;
         let int = Intersection::new(t, point, normal, self.material());
         Some(int)
     }

@@ -2,10 +2,14 @@
 use std::f64::consts::PI;
 
 use math::{VectorTrait, Normal, Direction, Point, Radiance};
+use primitives::{Object, Rectangle};
 use material::Color;
+use scene::{SceneGraph, Intersection};
+use sampling;
 
 pub trait Light : Send + Sync{
-    fn receive_radiance(&self, point: &Point, normal : &Normal) -> (Radiance, Direction);
+    fn light_points(&self) -> Vec<(Point,Option<Normal>)>;
+    fn radiance_from_point(&self, Point) -> Radiance;
 }
 
 pub struct PointLight {
@@ -21,11 +25,47 @@ impl PointLight {
 }
 
 impl Light for PointLight {
-    fn receive_radiance(&self, receiving_point: &Point, normal : &Normal) -> (Radiance, Direction) {
-        let dir = self.position - *receiving_point;
-        let r = dir.length();
-
-        let factor = self.power/(r*r*4.0*PI);
-        (Radiance::new(self.color.r()*factor, self.color.g()*factor, self.color.b()*factor), dir)
+    fn light_points(&self) -> Vec<(Point, Option<Normal>)> {
+        vec![(self.position, None)]
     }
+
+    fn radiance_from_point(&self, _: Point) -> Radiance {
+        let factor = self.power / (4.0*PI);
+        let rad = Radiance::gray(factor);
+        rad.apply_color(self.color)
+    }
+}
+
+pub struct SurfaceLight {
+    surface: Rectangle,
+    power: f64,
+    color: Color
+}
+
+impl SurfaceLight {
+    pub fn new(surface: Rectangle, power: f64, color: Color) -> SurfaceLight{
+        SurfaceLight{surface, power, color}
+    }
+}
+
+impl Light for SurfaceLight {
+    fn light_points(&self) -> Vec<(Point, Option<Normal>)> {
+        let normal: Option<Normal> = Some( (self.surface.transformation().inverted().transpose() * Normal::new(0.0, 1.0, 0.0)).normalize() );
+        let amt_samples = 64 as usize;
+
+        let mut vec = Vec::new();
+        for _ in 0..amt_samples {
+            let (u,v) = sampling::sample_rect(1.0,1.0);
+            let point = *self.surface.transformation().matrix()*(Point::new(self.surface.corner_point().x()*u, 0.0, self.surface.corner_point().z()*v));
+            vec.push((point,normal));
+        }
+        vec
+    }
+
+    fn radiance_from_point(&self, _: Point) -> Radiance {
+        let factor = self.power / (2.0*PI);
+        let rad = Radiance::gray(factor);
+        rad.apply_color(self.color)
+    }
+
 }

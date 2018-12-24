@@ -3,12 +3,12 @@ extern crate sdl2;
 
 use std::sync::{mpsc, Arc};
 use std::sync::mpsc::{Sender, Receiver};
-use std::f64::consts::FRAC_PI_2;
+use std::f64::consts::{PI,FRAC_PI_2};
 
 use primitives::{Sphere,Plane,Rectangle,BoxObject};
 use camera::{Pixel, PerspectiveCamera};
 use scene::{SceneGraph, Intersection};
-use lights::PointLight;
+use lights::{PointLight, SurfaceLight};
 use math::{VectorTrait, Point, Normal, Vector, Transformation, Ray, RotationAxis};
 use material::{Color,Lambertian};
 
@@ -31,16 +31,15 @@ fn default_scene() -> SceneGraph{
 
     let position = super::math::Point::new(0.0,8.0,0.0);
     let position2 = super::math::Point::new(-2.0,2.0,0.0);
-    scene_graph.add_light( Box::new(PointLight::new(position,2000.0, Color::gray(1.0))) );
+    //scene_graph.add_light( Box::new(PointLight::new(position,2000.0, Color::gray(1.0))) );
+    let surface = Rectangle::new(Point::new(2.0, 0.0, 2.0), Transformation::new().rotate(RotationAxis::Xaxis, PI).translate(Vector::new(0.0, 6.0, 0.0)), Box::new(Lambertian::new(Color::gray(1.0))) );
+    scene_graph.add_light( Box::new(SurfaceLight::new(surface ,1000.0, Color::gray(1.0))) );
     scene_graph.add_light( Box::new(PointLight::new(position2,200.0, Color::gray(1.0))) );
     scene_graph
 }
 
 pub fn render(width : i32, height : i32){
-    let (sender, receiver) = mpsc::channel();
-
-    start_threads(sender, width, height);
-    run_program_loop(receiver, width as u32, height as u32);
+    run_program_loop(width, height);
 }
 
 fn start_threads(sender : Sender<Vec<(Pixel,Color)>>, width : i32, height : i32) {
@@ -105,17 +104,23 @@ fn distance_color_map(intersect: Option<Intersection>, camera_position: Point) -
     }
 }
 
-fn run_program_loop(receiver : Receiver<Vec<(Pixel,Color)>>, width : u32, height : u32){
+fn run_program_loop(width : i32, height : i32){
+
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
-    let window = video_subsystem.window("rust renderer", width, height)
+    let window = video_subsystem.window("rust renderer", width as u32, height as u32)
         .position_centered()
         .opengl()
         .build()
         .unwrap();
 
     let mut canvas = window.into_canvas().build().unwrap();
+
+    let (sender, receiver) = mpsc::channel();
+    std::thread::spawn( move || {
+        start_threads(sender, width, height);
+    });
 
     let mut quit = false;
     while !quit {

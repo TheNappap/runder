@@ -103,7 +103,7 @@ impl Mul<Matrix> for Matrix {
     }
 }
 
-impl Mul<Vector> for &Matrix {
+impl Mul<Vector> for Matrix {
     type Output = Vector;
 
     fn mul(self, rhs: Vector) -> Vector {
@@ -115,7 +115,7 @@ impl Mul<Vector> for &Matrix {
     }
 }
 
-impl Mul<Point> for &Matrix {
+impl Mul<Point> for Matrix {
     type Output = Point;
 
     fn mul(self, rhs: Point) -> Point {

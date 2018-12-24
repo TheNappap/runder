@@ -6,6 +6,7 @@ mod camera;
 mod lights;
 mod scene;
 mod material;
+mod sampling;
 
 fn main() {
     let width = 800;
