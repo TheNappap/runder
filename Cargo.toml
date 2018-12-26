@@ -12,3 +12,6 @@ version = "*"
 
 [dependencies.rand]
 version = "*"
+
+[dependencies.itertools]
+version = "*"

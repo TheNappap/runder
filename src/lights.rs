@@ -53,7 +53,7 @@ impl Light for SurfaceLight {
         let normal: Option<Normal> = Some( (self.surface.transformation().inverted().transpose() * Normal::new(0.0, 1.0, 0.0)).normalize() );
         let amt_samples = 4 as usize;
 
-        sampling::sample_rect(1.0,1.0, SamplingTechnique::Stratified {seed: 0.0}, 8).iter().map(|(u, v) |{
+        sampling::sample_rect(1.0,1.0, SamplingTechnique::Stratified{seed: 0.0}, 4).iter().map(|(u, v) |{
             let point = *self.surface.transformation().matrix()*(Point::new(self.surface.corner_point().x()*u, 0.0, self.surface.corner_point().z()*v));
             (point, normal)
         }).collect()
