@@ -1,18 +1,35 @@
 
 extern crate rand;
 extern crate itertools;
-
 use self::itertools::iproduct;
 
+#[derive(Copy, Clone)]
 pub enum SamplingTechnique {
-    Grid,
-    Random{seed: f64},
-    Stratified{seed: f64}
+    Grid(i32),
+    Random{
+        multi_sample: i32,
+        seed: f64
+    },
+    Stratified{
+        multi_sample: i32,
+        seed: f64
+    }
 }
 
-pub fn sample_rect(width: f64, height: f64, technique: SamplingTechnique, sqrt_amt: u32) -> Vec<(f64,f64)> {
+impl SamplingTechnique {
+    pub fn multi_sample(&self) -> i32 {
+        match self {
+            SamplingTechnique::Grid(ms) => *ms,
+            SamplingTechnique::Random{multi_sample, ..} => *multi_sample,
+            SamplingTechnique::Stratified{multi_sample, ..} => *multi_sample,
+        }
+    }
+}
+
+pub fn sample_rect(width: f64, height: f64, technique: SamplingTechnique) -> Vec<(f64,f64)> {
+    let sqrt_amt = technique.multi_sample();
     match technique {
-        SamplingTechnique::Grid => iproduct!(0..sqrt_amt,0..sqrt_amt).map(|(i,j)|{
+        SamplingTechnique::Grid(_) => iproduct!(0..sqrt_amt,0..sqrt_amt).map(|(i,j)|{
             let u = (width/sqrt_amt as f64)*(i as f64 + 0.5);
             let v = (height/sqrt_amt as f64)*(j as f64 + 0.5);
             (u,v)

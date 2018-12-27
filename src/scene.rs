@@ -1,18 +1,22 @@
 
+use std::sync::{Arc};
+use settings::Settings;
+
 use primitives::Object;
 use math::{VectorTrait, Point, Direction, Normal, Ray, Radiance};
 use lights::Light;
 use material::Material;
 
 pub struct SceneGraph{
+    settings: Arc<Settings>,
     objects : Vec<Box<Object>>,
     lights : Vec<Box<Light>>
 }
 
 impl SceneGraph {
 
-    pub fn new() -> SceneGraph{
-        SceneGraph{objects: Vec::new(), lights: Vec::new()}
+    pub fn new(settings: Arc<Settings>) -> SceneGraph{
+        SceneGraph{settings, objects: Vec::new(), lights: Vec::new()}
     }
 
     pub fn add_object(&mut self, object : Box<Object>){
@@ -47,7 +51,7 @@ impl SceneGraph {
         let mut radiance = Radiance::zero();
         for light in &self.lights {
             let mut rad = Radiance::zero();
-            let light_points = light.light_points();
+            let light_points = light.light_points(self.settings.sampling_technique);
             let amount = light_points.len();
             for (light_point, opt_normal) in light_points{
                 let incoming = (light_point - intersection.point()).normalize();

@@ -7,10 +7,15 @@ mod lights;
 mod scene;
 mod material;
 mod sampling;
+mod settings;
 
 fn main() {
-    let width = 800;
-    let height = 600;
+    let settings = settings::Settings {
+        screen_width: 800,
+        screen_height: 600,
+        aa_multi_sample: 2,
+        sampling_technique: sampling::SamplingTechnique::Stratified{multi_sample: 2, seed: 0.0}
+    };
 
-    renderer::render(width, height);
+    renderer::render(settings);
 }

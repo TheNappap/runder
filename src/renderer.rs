@@ -5,23 +5,24 @@ use std::sync::{mpsc, Arc};
 use std::sync::mpsc::{Sender, Receiver};
 use std::f64::consts::{PI,FRAC_PI_2};
 
+use settings::Settings;
 use primitives::{Sphere,Plane,Rectangle,BoxObject};
 use camera::{Pixel, PerspectiveCamera};
 use scene::{SceneGraph, Intersection};
 use lights::{PointLight, SurfaceLight};
-use math::{VectorTrait, Point, Normal, Vector, Transformation, Ray, RotationAxis};
+use math::{VectorTrait, Point, Normal, Vector, Transformation, Ray, RotationAxis, Radiance};
 use material::{Color,Lambertian};
 
-fn default_camera() -> PerspectiveCamera
+fn default_camera(settings: Arc<Settings>) -> PerspectiveCamera
 {
     let position = super::math::Point::origin();
     let direction = super::math::Direction::new(0.0,0.0,1.0);
     let up = super::math::Direction::new(0.0,1.0,0.0);
-    PerspectiveCamera::new(position,direction,up,80.0)
+    PerspectiveCamera::new(settings, position,direction,up,80.0)
 }
 
-fn default_scene() -> SceneGraph{
-    let mut scene_graph = SceneGraph::new();
+fn default_scene(settings: Arc<Settings>) -> SceneGraph{
+    let mut scene_graph = SceneGraph::new(settings);
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(0.0, 0.0, 2.0)), Box::new(Lambertian::new(Color::new(1.0,0.0, 0.0))) )));
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().scale(2.0, 1.0, 1.0).translate(Vector::new(2.0, 0.0, 3.0)),Box::new(Lambertian::new(Color::new(0.0,1.0, 1.0))) )));
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(-2.0, 0.0, 3.0)),Box::new(Lambertian::new(Color::gray(0.50))) )));
@@ -31,27 +32,32 @@ fn default_scene() -> SceneGraph{
 
     let position = super::math::Point::new(0.0,8.0,0.0);
     let position2 = super::math::Point::new(-2.0,2.0,0.0);
-    //scene_graph.add_light( Box::new(PointLight::new(position,2000.0, Color::gray(1.0))) );
     let surface = Rectangle::new(Point::new(2.0, 0.0, 2.0), Transformation::new().rotate(RotationAxis::Xaxis, PI).translate(Vector::new(0.0, 6.0, 0.0)), Box::new(Lambertian::new(Color::gray(1.0))) );
     scene_graph.add_light( Box::new(SurfaceLight::new(surface ,1000.0, Color::gray(1.0))) );
     scene_graph.add_light( Box::new(PointLight::new(position2,200.0, Color::gray(1.0))) );
+    //scene_graph.add_light( Box::new(PointLight::new(position,2000.0, Color::gray(1.0))) );
     scene_graph
 }
 
-pub fn render(width : i32, height : i32){
-    run_program_loop(width, height);
+pub fn render(settings: Settings){
+    run_program_loop(settings);
 }
 
-fn start_threads(sender : Sender<Vec<(Pixel,Color)>>, width : i32, height : i32) {
+fn start_threads(settings: Settings, sender : Sender<Vec<(Pixel,Color)>>){
+    let width = settings.screen_width;
+    let height = settings.screen_height;
     let chunk_width = 80;
     let chunk_height = 60;
-    let camera = default_camera();
-    let scene_graph = Arc::new(default_scene());
+    let settings = Arc::new(settings);
+    let camera = Arc::new( default_camera(settings.clone()) );
+    let scene_graph = Arc::new(default_scene(settings.clone()));
 
     for w in 0..(width/chunk_width)+1{
         for h in 0..(height/chunk_height)+1{
             let sender_clone = Sender::clone(&sender);
+            let settings = settings.clone();
             let scene = scene_graph.clone();
+            let camera= camera.clone();
 
             std::thread::spawn( move || {
                 let mut pixels = vec![];
@@ -63,12 +69,7 @@ fn start_threads(sender : Sender<Vec<(Pixel,Color)>>, width : i32, height : i32)
                     let till_h = if height-h < chunk_height {h+(height-h)} else {h+chunk_height};
 
                     for y in h..till_h{
-                        let ray = camera.ray_for_pixel(width, height, Pixel{x,y});
-                        let intersect = scene.intersect(&ray);
-                        let color = radiance_color_map(&scene, intersect, ray);
-                        //let color = normal_color_map(intersect);
-                        //let color = distance_color_map(intersect, camera.position());
-                        pixels.push((Pixel{x,y},color));
+                        pixels.push(calucate_pixel(Pixel{x,y}, settings.aa_multi_sample, &camera, &scene));
                     }
                 }
                 sender_clone.send(pixels).unwrap();
@@ -77,11 +78,29 @@ fn start_threads(sender : Sender<Vec<(Pixel,Color)>>, width : i32, height : i32)
     }
 }
 
-fn radiance_color_map(scene: &SceneGraph , intersect: Option<Intersection>, ray: Ray ) -> Color{
-    match intersect {
-        None => Color::black(),
-        Some(intersect) => Color::radiance_to_color(scene.receive_radiance(intersect, ray.direction().invert()))
-    }
+fn calucate_pixel(pixel: Pixel, multi_sample: i32, camera: &PerspectiveCamera, scene: &SceneGraph) -> (Pixel, Color) {
+    //let intersect;
+    let rad = camera.rays_for_pixel(&pixel).iter().map(|ray|{
+        //println!("pixel: {:?}, raydir: {:?}", pixel, ray.direction());
+        (scene.intersect(ray), ray.direction())
+    }).map(|(int,dir)|{
+        //intersect = &int;
+        match int {
+            None => Radiance::zero(),
+            Some(i) => scene.receive_radiance(i, dir.invert())
+        }
+    }).fold(Radiance::zero(), |acc,rad|{
+        acc + rad
+    }) * (1.0/(multi_sample*multi_sample) as f64);
+
+    let color = radiance_color_map(rad);
+    //let color = normal_color_map(intersect);
+    //let color = distance_color_map(intersect, camera.position());
+    (pixel,color)
+}
+
+fn radiance_color_map(rad: Radiance ) -> Color{
+    Color::radiance_to_color(rad)
 }
 
 fn normal_color_map(intersect: Option<Intersection>) -> Color{
@@ -104,12 +123,12 @@ fn distance_color_map(intersect: Option<Intersection>, camera_position: Point) -
     }
 }
 
-fn run_program_loop(width : i32, height : i32){
+fn run_program_loop(settings: Settings){
 
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
-    let window = video_subsystem.window("rust renderer", width as u32, height as u32)
+    let window = video_subsystem.window("rust renderer", settings.screen_width as u32, settings.screen_height as u32)
         .position_centered()
         .opengl()
         .build()
@@ -120,7 +139,7 @@ fn run_program_loop(width : i32, height : i32){
 
     let (sender, receiver) = mpsc::channel();
     std::thread::spawn( move || {
-        start_threads(sender, width, height);
+        start_threads(settings, sender);
     });
 
     let mut quit = false;
