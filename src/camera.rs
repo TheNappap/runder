@@ -41,7 +41,7 @@ impl PerspectiveCamera {
         iproduct!(0..multi_sample,0..multi_sample).map(|(i,j)| {
             let ratio = width / height;
             let x = (2.0 * (( (multi_sample*pixel.x + i) as f64 + 0.5) / (width*multi_sample as f64) ) - 1.0) * (self.fov / 2.0 * PI / 180.0).tan() * ratio;
-            let y = (1.0 - 2.0 * (( (multi_sample*pixel.y + j) as f64 + 0.5) / (height*multi_sample as f64) ) * (self.fov / 2.0 * PI / 180.0).tan());
+            let y = (1.0 - 2.0 * (( (multi_sample*pixel.y + j) as f64 + 0.5) / (height*multi_sample as f64) )) * (self.fov / 2.0 * PI / 180.0).tan();
             let direction = Direction::new(x, y, -1.0);
             Ray::new(self.position, direction)
         }).collect()

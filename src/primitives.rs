@@ -133,7 +133,7 @@ impl Object for Rectangle {
         if let Some(intersect) = self.plane.intersect(ray){
             let point = *self.transformation().inverted()*intersect.point();
 
-            if point.x() >= 0.0 && point.z() >= 0.0 && point.x() <= intersect.point().x() && point.z() <= intersect.point().z() {
+            if point.x() >= 0.0 && point.z() >= 0.0 && point.x() <= self.corner_point.x() && point.z() <= self.corner_point.z() {
                 return Some(intersect);
             }
         }
@@ -187,7 +187,7 @@ impl Object for BoxObject {
         if (tmin > tzmax) || (tzmin > tmax) { return None; }
 
         if tzmin > tmin { tmin = tzmin; }
-        if tzmax < tmax { tmax = tzmax; }
+        //if tzmax < tmax { tmax = tzmax; }
 
         let t = tmin;
         if t <= 0.0 { return None }

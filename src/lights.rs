@@ -1,10 +1,9 @@
 
 use std::f64::consts::PI;
 
-use math::{VectorTrait, Normal, Direction, Point, Radiance};
+use math::{VectorTrait, Normal, Point, Radiance};
 use primitives::{Object, Rectangle};
 use material::Color;
-use scene::{SceneGraph, Intersection};
 use sampling::{self, SamplingTechnique};
 
 pub trait Light : Send + Sync{
@@ -51,7 +50,6 @@ impl SurfaceLight {
 impl Light for SurfaceLight {
     fn light_points(&self, technique: SamplingTechnique) -> Vec<(Point, Option<Normal>)> {
         let normal: Option<Normal> = Some( (self.surface.transformation().inverted().transpose() * Normal::new(0.0, 1.0, 0.0)).normalize() );
-        let amt_samples = 4 as usize;
 
         sampling::sample_rect(1.0,1.0, technique).iter().map(|(u, v) |{
             let point = *self.surface.transformation().matrix()*(Point::new(self.surface.corner_point().x()*u, 0.0, self.surface.corner_point().z()*v));

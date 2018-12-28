@@ -1,7 +1,6 @@
 
-use super::matrix::{Matrix, RotationAxis};
-use super::Vector;
-use super::Ray;
+use math::matrix::{Matrix, RotationAxis};
+use math::Vector;
 
 #[derive(Debug)]
 pub struct Transformation {

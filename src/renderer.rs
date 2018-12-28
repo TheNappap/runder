@@ -2,55 +2,25 @@
 extern crate sdl2;
 
 use std::sync::{mpsc, Arc};
-use std::sync::mpsc::{Sender, Receiver};
-use std::f64::consts::{PI,FRAC_PI_2};
+use std::sync::mpsc::{Sender};
 
 use settings::Settings;
-use primitives::{Sphere,Plane,Rectangle,BoxObject};
 use camera::{Pixel, PerspectiveCamera};
 use scene::{SceneGraph, Intersection};
-use lights::{PointLight, SurfaceLight};
-use math::{VectorTrait, Point, Normal, Vector, Transformation, Ray, RotationAxis, Radiance};
-use material::{Color,Lambertian};
+use math::{VectorTrait, Point, Radiance};
+use material::{Color};
 
-fn default_camera(settings: Arc<Settings>) -> PerspectiveCamera
-{
-    let position = super::math::Point::origin();
-    let direction = super::math::Direction::new(0.0,0.0,1.0);
-    let up = super::math::Direction::new(0.0,1.0,0.0);
-    PerspectiveCamera::new(settings, position,direction,up,80.0)
+pub fn render(settings: Arc<Settings>, camera: PerspectiveCamera, scene: SceneGraph){
+    run_program_loop(settings, camera, scene);
 }
 
-fn default_scene(settings: Arc<Settings>) -> SceneGraph{
-    let mut scene_graph = SceneGraph::new(settings);
-    scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(0.0, 0.0, -3.0)), Box::new(Lambertian::new(Color::new(1.0,0.0, 0.0))) )));
-    scene_graph.add_object(Box::new(Sphere::new(Transformation::new().scale(2.0, 1.0, 1.0).translate(Vector::new(2.0, 0.0, -4.0)),Box::new(Lambertian::new(Color::new(0.0,1.0, 1.0))) )));
-    scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(-2.0, 0.0, -4.0)),Box::new(Lambertian::new(Color::gray(0.50))) )));
-    scene_graph.add_object(Box::new(Plane::new(Transformation::new().translate(Vector::new(0.0, -1.0, 0.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
-    scene_graph.add_object(Box::new(Rectangle::new(Point::new(2.0, 0.0, 2.0), Transformation::new().rotate(RotationAxis::Xaxis, -FRAC_PI_2).translate(Vector::new(0.0, 0.0, -4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
-    scene_graph.add_object(Box::new(BoxObject::new(Point::new(1.0, 1.0, 1.0), Transformation::new().translate(Vector::new(-4.0, 2.0, -4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
-
-    let position = super::math::Point::new(0.0,8.0,0.0);
-    let position2 = super::math::Point::new(-2.0,2.0,0.0);
-    let surface = Rectangle::new(Point::new(2.0, 0.0, 2.0), Transformation::new().rotate(RotationAxis::Xaxis, PI).translate(Vector::new(0.0, 6.0, 0.0)), Box::new(Lambertian::new(Color::gray(1.0))) );
-    scene_graph.add_light( Box::new(SurfaceLight::new(surface ,1000.0, Color::gray(1.0))) );
-    scene_graph.add_light( Box::new(PointLight::new(position2,200.0, Color::gray(1.0))) );
-    //scene_graph.add_light( Box::new(PointLight::new(position,2000.0, Color::gray(1.0))) );
-    scene_graph
-}
-
-pub fn render(settings: Settings){
-    run_program_loop(settings);
-}
-
-fn start_threads(settings: Settings, sender : Sender<Vec<(Pixel,Color)>>){
+fn start_threads(settings: Arc<Settings>, camera: PerspectiveCamera, scene_graph: SceneGraph, sender : Sender<Vec<(Pixel,Color)>>){
     let width = settings.screen_width;
     let height = settings.screen_height;
     let chunk_width = 80;
     let chunk_height = 60;
-    let settings = Arc::new(settings);
-    let camera = Arc::new( default_camera(settings.clone()) );
-    let scene_graph = Arc::new(default_scene(settings.clone()));
+    let camera = Arc::new( camera );
+    let scene_graph = Arc::new(scene_graph );
 
     for w in 0..(width/chunk_width)+1{
         for h in 0..(height/chunk_height)+1{
@@ -123,7 +93,7 @@ fn distance_color_map(intersect: Option<Intersection>, camera_position: Point) -
     }
 }
 
-fn run_program_loop(settings: Settings){
+fn run_program_loop(settings: Arc<Settings>, camera: PerspectiveCamera, scene: SceneGraph){
 
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -139,7 +109,7 @@ fn run_program_loop(settings: Settings){
 
     let (sender, receiver) = mpsc::channel();
     std::thread::spawn( move || {
-        start_threads(settings, sender);
+        start_threads(settings, camera, scene, sender);
     });
 
     let mut quit = false;
