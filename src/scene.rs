@@ -51,7 +51,7 @@ impl SceneGraph {
         let mut radiance = Radiance::zero();
         for light in &self.lights {
             let mut rad = Radiance::zero();
-            let light_points = light.light_points(self.settings.sampling_technique);
+            let light_points = light.light_points(self.settings.light_sampling_technique);
             let amount = light_points.len();
             for (light_point, opt_normal) in light_points{
                 let incoming = (light_point - intersection.point()).normalize();

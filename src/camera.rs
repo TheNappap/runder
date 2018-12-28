@@ -3,6 +3,7 @@ extern crate itertools;
 use self::itertools::iproduct;
 
 use std::sync::{Arc};
+use std::f64::consts::PI;
 use settings::Settings;
 use math::{Point, Direction, Ray};
 
@@ -38,12 +39,10 @@ impl PerspectiveCamera {
         let width = self.settings.screen_width as f64;
         let height = self.settings.screen_height as f64;
         iproduct!(0..multi_sample,0..multi_sample).map(|(i,j)| {
-            let x = pixel.x as f64 - width/2.0 + (i as f64 + 0.5)/multi_sample as f64;
-            let y = -pixel.y as f64 + height/2.0 + (j as f64 + 0.5)/multi_sample as f64;
-            //println!("i: {}, j: {}", i, j);
-            //println!("x: {}, y: {}", x, y);
-            let z = -(height/2.0)/(self.fov/2.0).tan();
-            let direction = Direction::new(x, y, z);
+            let ratio = width / height;
+            let x = (2.0 * (( (multi_sample*pixel.x + i) as f64 + 0.5) / (width*multi_sample as f64) ) - 1.0) * (self.fov / 2.0 * PI / 180.0).tan() * ratio;
+            let y = (1.0 - 2.0 * (( (multi_sample*pixel.y + j) as f64 + 0.5) / (height*multi_sample as f64) ) * (self.fov / 2.0 * PI / 180.0).tan());
+            let direction = Direction::new(x, y, -1.0);
             Ray::new(self.position, direction)
         }).collect()
     }
