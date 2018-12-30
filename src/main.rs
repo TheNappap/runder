@@ -8,6 +8,7 @@ mod scene;
 mod material;
 mod sampling;
 mod settings;
+mod obj_import;
 
 use std::sync::{Arc};
 use std::f64::consts::{PI,FRAC_PI_2};
@@ -19,14 +20,15 @@ use scene::{SceneGraph};
 use lights::{PointLight, SurfaceLight};
 use math::{Point, Vector, Transformation, RotationAxis};
 use material::{Color,Lambertian};
+use obj_import::parse_obj;
 
 
 fn main() {
     let settings = settings::Settings {
-        screen_width: 800,
-        screen_height: 600,
-        aa_multi_sample: 4,
-        light_sampling_technique: sampling::SamplingTechnique::Stratified{multi_sample: 2, seed: 0.0}
+        screen_width: 80,
+        screen_height: 60,
+        aa_multi_sample: 1,
+        light_sampling_technique: sampling::SamplingTechnique::Stratified{multi_sample: 1, seed: 0.0}
     };
 
     let settings = Arc::new(settings);
@@ -52,7 +54,9 @@ fn default_scene(settings: Arc<Settings>) -> SceneGraph{
     scene_graph.add_object(Box::new(Plane::new(Transformation::new().translate(Vector::new(0.0, -1.0, 0.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
     scene_graph.add_object(Box::new(Rectangle::new(Point::new(4.0, 0.0, 4.0), Transformation::new().rotate(RotationAxis::Xaxis, FRAC_PI_2).translate(Vector::new(0.0, 2.0, -4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
     scene_graph.add_object(Box::new(BoxObject::new(Point::new(1.0, 1.0, 1.0), Transformation::new().translate(Vector::new(-4.0, 2.0, -4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
-    scene_graph.add_object(Box::new(Triangle::new(Point::new(1.0, -0.5, -2.0),Point::new(-1.0, -0.5, -1.0),Point::new(1.0, -0.5, -1.0), Transformation::new(), Box::new(Lambertian::new(Color::gray(1.0))) )));
+    scene_graph.add_object(Box::new(Triangle::new([Point::new(1.0, -0.5, -2.0),Point::new(-1.0, -0.5, -1.0),Point::new(1.0, -0.5, -1.0)], Transformation::new(), Box::new(Lambertian::new(Color::gray(1.0))) )));
+    let mesh = parse_obj("obj\\teapot.obj").expect("Could not read obj");
+    //scene_graph.add_object(Box::new(mesh));
 
     //let position = math::Point::new(0.0,8.0,0.0);
     let position = math::Point::new(-2.0,2.0,0.0);

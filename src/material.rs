@@ -49,7 +49,7 @@ pub trait Material : Send + Sync + Debug{
 //////////////////
 //Lambertian
 //////////////////
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Lambertian {
     color: Color
 }

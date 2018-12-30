@@ -217,16 +217,14 @@ impl Object for BoxObject {
 //////////////////
 #[derive(Debug)]
 pub struct Triangle {
-    point1 : Point,
-    point2 : Point,
-    point3 : Point,
+    vertices : [Point; 3],
     transformation : Transformation,
     material : Box<Material>
 }
 
 impl Triangle{
-    pub fn new(point1: Point, point2: Point, point3: Point, transformation : Transformation, material: Box<Material>) -> Triangle{
-        Triangle{point1, point2, point3, transformation, material}
+    pub fn new(vertices : [Point; 3], transformation : Transformation, material: Box<Material>) -> Triangle{
+        Triangle{vertices, transformation, material}
     }
 }
 
@@ -234,19 +232,16 @@ impl Object for Triangle{
     //Möller–Trumbore
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         let (origin, direction) = (*self.transformation.inverted()*ray.origin(), *self.transformation.inverted()*ray.direction());
-        let vertex0 = self.point1;
-        let vertex1 = self.point2;
-        let vertex2 = self.point3;
-        let edge1 = vertex1 - vertex0;
-        let edge2 = vertex2 - vertex0;
-        let h = direction.cross(edge2);
-        let a = edge1.dot(&h);
-        if a > -1e-12 && a < 1e-12{
+        let edge1 = self.vertices[1] - self.vertices[0];
+        let edge2 = self.vertices[2] - self.vertices[0];
+        let normal = direction.cross(edge2);
+        let cos = edge1.dot(&normal);
+        if cos > -1e-12 && cos < 1e-12{
             return None;
         }    // This ray is parallel to this triangle.
-        let f = 1.0/a;
-        let s = origin - vertex0;
-        let u = f * (s.dot(&h));
+        let f = 1.0/cos;
+        let s = origin - self.vertices[0];
+        let u = f * (s.dot(&normal));
         if u < 0.0 || u > 1.0 {
             return None;
         }
@@ -266,6 +261,43 @@ impl Object for Triangle{
         else{
             return None;
         }
+    }
+
+    fn transformation(&self) -> &Transformation { &self.transformation }
+
+    fn material(&self) -> &Material { self.material.as_ref() }
+}
+
+//////////////////
+//TriangleMesh
+//////////////////
+#[derive(Debug)]
+pub struct TriangleMesh {
+    triangles : Vec<Triangle>,
+    transformation : Transformation,
+    material : Box<Material>
+}
+
+impl TriangleMesh{
+    pub fn new(triangles: Vec<Triangle>, transformation : Transformation, material: Box<Material>) -> TriangleMesh{
+        TriangleMesh{triangles, transformation, material}
+    }
+}
+
+impl Object for TriangleMesh{
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        self.triangles.iter().map(|tr|{
+            tr.intersect(ray)
+        }).fold(None, |acc, opt_int : Option<Intersection>|{
+            match opt_int {
+                None => acc,
+                Some(int) => if let Some(acc_int) = acc {
+                    if int.t() < acc_int.t() { Some(int) }
+                    else { Some(acc_int) }
+                }
+                else { Some(int) }
+            }
+        })
     }
 
     fn transformation(&self) -> &Transformation { &self.transformation }

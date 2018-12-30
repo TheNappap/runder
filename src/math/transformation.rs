@@ -2,7 +2,7 @@
 use math::matrix::{Matrix, RotationAxis};
 use math::Vector;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Transformation {
     matrix: Matrix,
     inverted: Matrix
