@@ -211,3 +211,64 @@ impl Object for BoxObject {
 
     fn material(&self) -> &Material { self.material.as_ref() }
 }
+
+//////////////////
+//Triangle
+//////////////////
+#[derive(Debug)]
+pub struct Triangle {
+    point1 : Point,
+    point2 : Point,
+    point3 : Point,
+    transformation : Transformation,
+    material : Box<Material>
+}
+
+impl Triangle{
+    pub fn new(point1: Point, point2: Point, point3: Point, transformation : Transformation, material: Box<Material>) -> Triangle{
+        Triangle{point1, point2, point3, transformation, material}
+    }
+}
+
+impl Object for Triangle{
+    //Möller–Trumbore
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        let (origin, direction) = (*self.transformation.inverted()*ray.origin(), *self.transformation.inverted()*ray.direction());
+        let vertex0 = self.point1;
+        let vertex1 = self.point2;
+        let vertex2 = self.point3;
+        let edge1 = vertex1 - vertex0;
+        let edge2 = vertex2 - vertex0;
+        let h = direction.cross(edge2);
+        let a = edge1.dot(&h);
+        if a > -1e-12 && a < 1e-12{
+            return None;
+        }    // This ray is parallel to this triangle.
+        let f = 1.0/a;
+        let s = origin - vertex0;
+        let u = f * (s.dot(&h));
+        if u < 0.0 || u > 1.0 {
+            return None;
+        }
+        let q = s.cross(edge1);
+        let v = f * direction.dot(&q);
+        if v < 0.0 || u + v > 1.0 {
+            return None;
+        }
+        // At this stage we can compute t to find out where the intersection point is on the line.
+        let t = f * edge2.dot(&q);
+            if t > 0.0 { // ray intersection
+            let point = *self.transformation.matrix()*(origin + t*direction);
+            let normal = (self.transformation.inverted().transpose()*edge1.cross(edge2)).normalize();
+            let int = Intersection::new(t, point, normal, self.material());
+            Some(int)
+        }
+        else{
+            return None;
+        }
+    }
+
+    fn transformation(&self) -> &Transformation { &self.transformation }
+
+    fn material(&self) -> &Material { self.material.as_ref() }
+}

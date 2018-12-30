@@ -13,7 +13,7 @@ use std::sync::{Arc};
 use std::f64::consts::{PI,FRAC_PI_2};
 
 use settings::Settings;
-use primitives::{Sphere,Plane,Rectangle,BoxObject};
+use primitives::{Sphere,Plane,Rectangle,BoxObject,Triangle};
 use camera::{PerspectiveCamera};
 use scene::{SceneGraph};
 use lights::{PointLight, SurfaceLight};
@@ -52,6 +52,7 @@ fn default_scene(settings: Arc<Settings>) -> SceneGraph{
     scene_graph.add_object(Box::new(Plane::new(Transformation::new().translate(Vector::new(0.0, -1.0, 0.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
     scene_graph.add_object(Box::new(Rectangle::new(Point::new(4.0, 0.0, 4.0), Transformation::new().rotate(RotationAxis::Xaxis, FRAC_PI_2).translate(Vector::new(0.0, 2.0, -4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
     scene_graph.add_object(Box::new(BoxObject::new(Point::new(1.0, 1.0, 1.0), Transformation::new().translate(Vector::new(-4.0, 2.0, -4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
+    scene_graph.add_object(Box::new(Triangle::new(Point::new(1.0, -0.5, -2.0),Point::new(-1.0, -0.5, -1.0),Point::new(1.0, -0.5, -1.0), Transformation::new(), Box::new(Lambertian::new(Color::gray(1.0))) )));
 
     //let position = math::Point::new(0.0,8.0,0.0);
     let position = math::Point::new(-2.0,2.0,0.0);

@@ -81,14 +81,21 @@ impl Vector {
         (self.0*self.0).sum().sqrt()
     }
 
+    pub fn invert(mut self) -> Vector {
+        self.0 = self.0.invert();
+        self
+    }
+
     pub fn normalize(mut self) -> Vector{
         self.0 = self.0 / self.length();
         self
     }
 
-    pub fn invert(mut self) -> Vector {
-        self.0 = self.0.invert();
-        self
+    pub fn cross(self, other: Vector) -> Vector {
+        let x = self.y()*other.z() - self.z()*other.y();
+        let y = self.z()*other.x() - self.x()*other.z();
+        let z = self.x()*other.y() - self.y()*other.x();
+        Vector::new(x,y,z)
     }
 }
 
