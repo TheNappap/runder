@@ -1,39 +1,5 @@
 
-use std::ops::{Add,Mul};
-use super::types::*;
-use super::base::BaseVector;
-use super::super::material::Color;
-
-//////////////////
-//VectorTrait
-//////////////////
-pub trait VectorTrait{
-    fn base(&self) -> &BaseVector;
-    fn x(&self) -> f64 { return self.base().x }
-    fn y(&self) -> f64 { return self.base().y }
-    fn z(&self) -> f64 { return self.base().z }
-
-    fn sum(&self) -> f64 { self.base().x+self.base().y+self.base().z }
-    fn dot(&self, v : &VectorTrait) -> f64 { (*self.base()**v.base()).sum()}
-}
-
-//////////////////
-//Ray
-//////////////////
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub struct Ray{
-    origin:Point,
-    direction:Direction
-}
-
-impl Ray {
-    pub fn new(origin: Point, direction: Direction) -> Ray{
-        Ray{origin, direction: direction.normalize()}
-    }
-
-    pub fn origin(&self) -> Point { self.origin }
-    pub fn direction(&self) -> Direction { self.direction }
-}
+use std::ops::{Add, Mul};
 
 //////////////////
 //Radiance
@@ -100,5 +66,41 @@ impl Mul<Radiance> for f64{
         rhs.g = rhs.g*self;
         rhs.b = rhs.b*self;
         rhs
+    }
+}
+
+
+//////////////////
+//Color
+//////////////////
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct Color {
+    r: f64,
+    g: f64,
+    b: f64
+}
+
+impl Color {
+    pub fn black() -> Color {
+        Color{r:0.0,g:0.0,b:0.0}
+    }
+
+    pub fn gray(value: f64) -> Color{
+        Color{r:value,g:value,b:value}
+    }
+
+    pub fn new(r: f64, g: f64, b: f64) -> Color{
+        Color{r,g,b}
+    }
+
+    pub fn r(&self) -> f64 { self.r }
+    pub fn g(&self) -> f64 { self.g }
+    pub fn b(&self) -> f64 { self.b }
+
+    pub fn radiance_to_color(rad: Radiance) -> Color{
+        let r = rad.r().min(1.0);
+        let g =  rad.g().min(1.0);
+        let b =  rad.b().min(1.0);
+        Color{r, g, b}
     }
 }

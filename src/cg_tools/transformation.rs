@@ -1,6 +1,5 @@
 
-use math::matrix::{Matrix, RotationAxis};
-use math::Vector;
+use math::{Matrix, RotationAxis, Vector};
 
 #[derive(Clone, Debug)]
 pub struct Transformation {

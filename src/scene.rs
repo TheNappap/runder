@@ -2,10 +2,10 @@
 use std::sync::{Arc};
 use settings::Settings;
 
-use primitives::Object;
-use math::{VectorTrait, Point, Direction, Normal, Ray, Radiance};
-use lights::Light;
-use material::Material;
+use math::{VectorTrait, Point, Direction, Normal};
+use cg_tools::{Ray,Transformation};
+use objects::{Object, Light, Material};
+use units::Radiance;
 
 pub struct SceneGraph{
     settings: Arc<Settings>,
@@ -93,6 +93,15 @@ impl<'a> Intersection<'a>{
     pub fn t(&self) -> f64 { self.t }
     pub fn point(&self) -> Point { self.point }
     pub fn normal(&self) -> Normal { self.normal }
+    pub fn material(&self) -> &'a Material { self.material }
+
+    pub fn transform(mut self, transformation: &Transformation) -> Intersection<'a> {
+        let v = self.t*self.normal();
+        self.t = (transformation.matrix()*v).length();
+        self.point = transformation.matrix()*self.point;
+        self.normal = (&transformation.inverted().transpose()*self.normal).normalize();
+        self
+    }
 
     pub fn closest_intersection(first: Option<Intersection<'a>>, second: Option<Intersection<'a>>) -> Option<Intersection<'a>>{
         if let Some(int1) = first {

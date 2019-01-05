@@ -1,7 +1,22 @@
 
 use std::ops::{Add,Sub,Mul};
-use super::base::BaseVector;
-use super::utils::VectorTrait;
+use std::f64;
+
+use super::base_vector::BaseVector;
+use units::Color;
+
+//////////////////
+//VectorTrait
+//////////////////
+pub trait VectorTrait{
+    fn base(&self) -> &BaseVector;
+    fn x(&self) -> f64 { return self.base().x() }
+    fn y(&self) -> f64 { return self.base().y() }
+    fn z(&self) -> f64 { return self.base().z() }
+
+    fn sum(&self) -> f64 { self.base().x()+self.base().y()+self.base().z() }
+    fn dot(&self, v : &VectorTrait) -> f64 { (*self.base()**v.base()).sum()}
+}
 
 //////////////////
 //Point
@@ -12,12 +27,28 @@ pub struct Point(BaseVector);
 impl Point {
     pub fn origin() -> Point
     {
-        Point( BaseVector { x:0.0, y:0.0, z:0.0 } )
+        Point( BaseVector::new(0.0, 0.0,0.0 ) )
     }
 
     pub fn new(x: f64, y: f64, z: f64) -> Point
     {
-        Point( BaseVector { x, y, z } )
+        Point( BaseVector::new( x, y, z ) )
+    }
+
+    pub fn max_point() -> Point {
+        Point(BaseVector::new_same_element(f64::MAX))
+    }
+
+    pub fn min_point() -> Point {
+        Point(BaseVector::new_same_element(f64::MIN))
+    }
+
+    pub fn max(&self, other: Point) -> Point {
+        Point::new(self.x().max(other.x()), self.y().max(other.y()),self.z().max(other.z()))
+    }
+
+    pub fn min(&self, other: Point) -> Point {
+        Point::new(self.x().min(other.x()), self.y().min(other.y()),self.z().min(other.z()))
     }
 }
 
@@ -38,9 +69,9 @@ impl Sub<Point> for Point {
     type Output = Vector;
 
     fn sub(self, rhs: Point) -> Vector {
-        let x = self.0.x - rhs.0.x;
-        let y = self.0.y - rhs.0.y;
-        let z = self.0.z - rhs.0.z;
+        let x = self.0.x() - rhs.0.x();
+        let y = self.0.y() - rhs.0.y();
+        let z = self.0.z() - rhs.0.z();
         Vector::new(x,y,z)
     }
 }
@@ -74,7 +105,7 @@ pub type Normal = Vector;
 impl Vector {
     pub fn new(x: f64, y: f64, z: f64) -> Vector
     {
-        Vector( BaseVector { x, y, z } )
+        Vector( BaseVector::new( x, y, z ) )
     }
 
     pub fn length(&self) -> f64 {
@@ -101,6 +132,15 @@ impl Vector {
 
 impl VectorTrait for Vector{
     fn base(&self) -> &BaseVector { &self.0 }
+}
+
+impl Add<Vector> for Vector {
+    type Output = Vector;
+
+    fn add(self, mut rhs: Vector) -> Vector {
+        rhs.0 = rhs.0 + self.0;
+        rhs
+    }
 }
 
 impl Add<Point> for Vector {

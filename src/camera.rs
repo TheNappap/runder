@@ -5,7 +5,8 @@ use self::itertools::iproduct;
 use std::sync::{Arc};
 use std::f64::consts::PI;
 use settings::Settings;
-use math::{Point, Direction, Ray};
+use math::{Point, Direction};
+use cg_tools::Ray;
 
 #[derive(Clone, Debug)]
 pub struct Pixel{

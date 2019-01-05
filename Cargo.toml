@@ -7,9 +7,6 @@ authors = ["TheNappap <mathijs.delabie@student.kuleuven.be>"]
 [dependencies.sdl2]
 version = "*"
 
-[dependencies.cgmath]
-version = "*"
-
 [dependencies.rand]
 version = "*"
 

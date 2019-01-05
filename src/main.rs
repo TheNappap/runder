@@ -1,34 +1,34 @@
 
 mod renderer;
 mod math;
-mod primitives;
+mod cg_tools;
 mod camera;
-mod lights;
+mod objects;
 mod scene;
-mod material;
-mod sampling;
 mod settings;
-mod obj_import;
+mod units;
 
 use std::sync::{Arc};
 use std::f64::consts::{PI,FRAC_PI_2};
 
 use settings::Settings;
-use primitives::{Sphere,Plane,Rectangle,BoxObject,Triangle};
+use objects::*;
 use camera::{PerspectiveCamera};
 use scene::{SceneGraph};
-use lights::{PointLight, SurfaceLight};
-use math::{Point, Vector, Transformation, RotationAxis};
-use material::{Color,Lambertian};
-use obj_import::parse_obj;
+use math::{Point, Vector, RotationAxis};
+use cg_tools::{SamplingTechnique,Transformation};
+use units::Color;
 
 
 fn main() {
     let settings = settings::Settings {
-        screen_width: 80,
-        screen_height: 60,
+        screen_width: 800,
+        screen_height: 600,
+        chunk_width: 80,
+        chunk_height: 60,
+        amt_threads: 4,
         aa_multi_sample: 1,
-        light_sampling_technique: sampling::SamplingTechnique::Stratified{multi_sample: 1, seed: 0.0}
+        light_sampling_technique: SamplingTechnique::Stratified{multi_sample: 1, seed: 0.0}
     };
 
     let settings = Arc::new(settings);
@@ -51,16 +51,16 @@ fn default_scene(settings: Arc<Settings>) -> SceneGraph{
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(0.0, 0.0, -3.0)), Box::new(Lambertian::new(Color::new(1.0,0.0, 0.0))) )));
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().scale(2.0, 1.0, 1.0).translate(Vector::new(2.0, 0.0, -4.0)),Box::new(Lambertian::new(Color::new(0.0,1.0, 1.0))) )));
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(-2.0, 0.0, -4.0)),Box::new(Lambertian::new(Color::gray(0.50))) )));
-    scene_graph.add_object(Box::new(Plane::new(Transformation::new().translate(Vector::new(0.0, -1.0, 0.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
-    scene_graph.add_object(Box::new(Rectangle::new(Point::new(4.0, 0.0, 4.0), Transformation::new().rotate(RotationAxis::Xaxis, FRAC_PI_2).translate(Vector::new(0.0, 2.0, -4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
+    scene_graph.add_object(Box::new(Plane::new(Point::new(0.0, -1.0, 0.0), Vector::new(0.0, 1.0, 0.0), Transformation::new(), Box::new(Lambertian::new(Color::gray(1.0))) )));
+    scene_graph.add_object(Box::new(Rectangle::unit_square(Transformation::new().scale_all(4.0).rotate(RotationAxis::Xaxis, FRAC_PI_2).translate(Vector::new(0.0, 2.0, -6.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
     scene_graph.add_object(Box::new(BoxObject::new(Point::new(1.0, 1.0, 1.0), Transformation::new().translate(Vector::new(-4.0, 2.0, -4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
-    scene_graph.add_object(Box::new(Triangle::new([Point::new(1.0, -0.5, -2.0),Point::new(-1.0, -0.5, -1.0),Point::new(1.0, -0.5, -1.0)], Transformation::new(), Box::new(Lambertian::new(Color::gray(1.0))) )));
-    let mesh = parse_obj("obj\\teapot.obj").expect("Could not read obj");
-    //scene_graph.add_object(Box::new(mesh));
+    //let mesh = parse_obj("obj\\chair\\chair.obj").expect("Could not read obj");
+    let mesh = parse_obj("obj\\diamond.obj").expect("Could not read obj");
+    scene_graph.add_object(Box::new(mesh));
 
     //let position = math::Point::new(0.0,8.0,0.0);
     let position = math::Point::new(-2.0,2.0,0.0);
-    let surface = Rectangle::new(Point::new(2.0, 0.0, 2.0), Transformation::new().rotate(RotationAxis::Xaxis, PI).translate(Vector::new(0.0, 6.0, 0.0)), Box::new(Lambertian::new(Color::gray(1.0))) );
+    let surface = Rectangle::unit_square(Transformation::new().rotate(RotationAxis::Xaxis, PI).translate(Vector::new(0.0, 6.0, 0.0)),  Box::new(Lambertian::new(Color::gray(1.0))) );
     scene_graph.add_light( Box::new(SurfaceLight::new(surface ,1000.0, Color::gray(1.0))) );
     scene_graph.add_light( Box::new(PointLight::new(position,200.0, Color::gray(1.0))) );
     //scene_graph.add_light( Box::new(PointLight::new(position,2000.0, Color::gray(1.0))) );

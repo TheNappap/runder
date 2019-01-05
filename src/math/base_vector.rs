@@ -1,18 +1,31 @@
 
 use std::ops::{Add,Sub,Mul,Div};
-use super::utils::VectorTrait;
+use super::VectorTrait;
 
 //////////////////
 //BaseVector
 //////////////////
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct BaseVector {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64
+    x: f64,
+    y: f64,
+    z: f64
 }
 
 impl BaseVector {
+
+    pub fn new(x: f64, y: f64, z: f64) -> BaseVector {
+        BaseVector{x,y,z}
+    }
+
+    pub fn new_same_element(x: f64) -> BaseVector {
+        BaseVector{x, y: x, z: x}
+    }
+
+    pub fn x(&self) -> f64 { return self.x }
+    pub fn y(&self) -> f64 { return self.y }
+    pub fn z(&self) -> f64 { return self.z }
+
     pub fn invert(mut self) -> BaseVector {
         self.x = -self.x;
         self.y = -self.y;

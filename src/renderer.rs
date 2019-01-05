@@ -1,49 +1,60 @@
 
 extern crate sdl2;
+extern crate itertools;
+
+use self::itertools::iproduct;
+use std::iter::Iterator;
 
 use std::sync::{mpsc, Arc};
 use std::sync::mpsc::{Sender};
+use std::sync::atomic::{AtomicBool,Ordering};
 
 use settings::Settings;
 use camera::{Pixel, PerspectiveCamera};
 use scene::{SceneGraph, Intersection};
-use math::{VectorTrait, Point, Radiance};
-use material::{Color};
+use math::{VectorTrait, Point};
+use units::{Color, Radiance};
 
 pub fn render(settings: Arc<Settings>, camera: PerspectiveCamera, scene: SceneGraph){
+    let camera = Arc::new(camera);
+    let scene = Arc::new(scene);
     run_program_loop(settings, camera, scene);
 }
 
-fn start_threads(settings: Arc<Settings>, camera: PerspectiveCamera, scene_graph: SceneGraph, sender : Sender<Vec<(Pixel,Color)>>){
+fn handle_threads(chunks: &mut Iterator<Item=(i32,i32)>, thread_pool: &mut Vec<Arc<AtomicBool>>, settings: &Arc<Settings>, camera: &Arc<PerspectiveCamera>, scene_graph: &Arc<SceneGraph>, sender : &Sender<Vec<(Pixel,Color)>>){
     let width = settings.screen_width;
     let height = settings.screen_height;
-    let chunk_width = 80;
-    let chunk_height = 60;
-    let camera = Arc::new( camera );
-    let scene_graph = Arc::new(scene_graph );
+    let chunk_width = settings.chunk_width;
+    let chunk_height = settings.chunk_height;
 
-    for w in 0..(width/chunk_width)+1{
-        for h in 0..(height/chunk_height)+1{
-            let sender_clone = Sender::clone(&sender);
-            let settings = settings.clone();
-            let scene = scene_graph.clone();
-            let camera= camera.clone();
+    for thread in thread_pool.iter_mut() {
+        let is_ready = thread.load(Ordering::Relaxed);
+        if is_ready {
+            if let Some((w,h)) = chunks.next(){
+                let sender_clone = Sender::clone(&sender);
+                let settings = settings.clone();
+                let scene = scene_graph.clone();
+                let camera = camera.clone();
+                let thread_is_ready = thread.clone();
+                thread_is_ready.store(false, Ordering::Relaxed);
 
-            std::thread::spawn( move || {
-                let mut pixels = vec![];
-                let w = w*chunk_width;
-                let till_w = if width-w < chunk_width {w+(width-w)} else {w+chunk_width};
+                std::thread::spawn( move || {
+                    let mut pixels = vec![];
+                    let w = w*chunk_width;
+                    let till_w = if width-w < chunk_width {w+(width-w)} else {w+chunk_width};
 
-                for x in w..till_w{
-                    let h = h*chunk_height;
-                    let till_h = if height-h < chunk_height {h+(height-h)} else {h+chunk_height};
+                    for x in w..till_w{
+                        let h = h*chunk_height;
+                        let till_h = if height-h < chunk_height {h+(height-h)} else {h+chunk_height};
 
-                    for y in h..till_h{
-                        pixels.push(calucate_pixel(Pixel{x,y}, settings.aa_multi_sample, &camera, &scene));
+                        for y in h..till_h{
+                            pixels.push(calucate_pixel(Pixel{x,y}, settings.aa_multi_sample, &camera, &scene));
+                        }
                     }
-                }
-                sender_clone.send(pixels).unwrap();
-            });
+                    sender_clone.send(pixels).unwrap();
+                    thread_is_ready.store(true, Ordering::Relaxed);
+                });
+            }
         }
     }
 }
@@ -93,7 +104,7 @@ fn distance_color_map(intersect: Option<Intersection>, camera_position: Point) -
     }
 }
 
-fn run_program_loop(settings: Arc<Settings>, camera: PerspectiveCamera, scene: SceneGraph){
+fn run_program_loop(settings: Arc<Settings>, camera: Arc<PerspectiveCamera>, scene: Arc<SceneGraph>){
 
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -108,13 +119,14 @@ fn run_program_loop(settings: Arc<Settings>, camera: PerspectiveCamera, scene: S
     canvas.present();
 
     let (sender, receiver) = mpsc::channel();
-    std::thread::spawn( move || {
-        start_threads(settings, camera, scene, sender);
-    });
+    let mut thread_pool = vec![Arc::new(AtomicBool::new(true)); settings.amt_threads as usize];
+    let mut chunks = iproduct!(0..(settings.screen_width/settings.chunk_width)+1, 0..(settings.screen_height/settings.chunk_height)+1);
 
     let mut quit = false;
     while !quit {
-        if let Ok(pixels) = receiver.try_recv(){
+        handle_threads( &mut chunks, &mut thread_pool, &settings, &camera, &scene, &sender);
+
+        while let Ok(pixels) = receiver.try_recv(){
             for (pixel,color) in pixels{
                 let r = (color.r()*255.0) as u8;
                 let g = (color.g()*255.0) as u8;

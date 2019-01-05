@@ -1,10 +1,10 @@
 
 use std::f64::consts::PI;
 
-use math::{VectorTrait, Normal, Point, Radiance};
-use primitives::{Object, Rectangle};
-use material::Color;
-use sampling::{self, SamplingTechnique};
+use math::{VectorTrait, Normal, Point};
+use super::{Object, Rectangle};
+use units::{Color, Radiance};
+use cg_tools::SamplingTechnique;
 
 pub trait Light : Send + Sync{
     fn light_points(&self, sampling_technique: SamplingTechnique) -> Vec<(Point,Option<Normal>)>;
@@ -49,10 +49,15 @@ impl SurfaceLight {
 
 impl Light for SurfaceLight {
     fn light_points(&self, technique: SamplingTechnique) -> Vec<(Point, Option<Normal>)> {
-        let normal: Option<Normal> = Some( (self.surface.transformation().inverted().transpose() * Normal::new(0.0, 1.0, 0.0)).normalize() );
+        let normal: Option<Normal> = Some( (&self.surface.transformation().inverted().transpose() * Normal::new(0.0, 1.0, 0.0)).normalize() );
 
-        sampling::sample_rect(1.0,1.0, technique).iter().map(|(u, v) |{
-            let point = *self.surface.transformation().matrix()*(Point::new(self.surface.corner_point().x()*u, 0.0, self.surface.corner_point().z()*v));
+        technique.sample_rect(1.0,1.0).iter().map(|(u, v) |{
+            let points = self.surface.points();
+            let u_vector = points[1] - points[0];
+            let v_vector = points[3] - points[0];
+
+            let vector = *u*u_vector + *v*v_vector;
+            let point = self.surface.transformation().matrix()*(points[0]+vector);
             (point, normal)
         }).collect()
     }
