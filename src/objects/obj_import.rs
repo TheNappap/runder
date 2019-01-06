@@ -31,7 +31,7 @@ pub fn parse_obj(file_path: &str) -> Result<Mesh,Error> {
         Point::new(v[0], v[1], v[2])
     }).collect();
 
-    let transformation = Transformation::new().translate(Vector::new(0.0,1.0,-5.0));
+    let transformation = Transformation::new().translate(Vector::new(0.0,1.0,5.0));
     let material = Box::new(Lambertian::new(Color::gray(1.0)));
 
     let trans = transformation.clone();
@@ -48,7 +48,8 @@ pub fn parse_obj(file_path: &str) -> Result<Mesh,Error> {
         }
     }).collect();
 
-    println!("amount of faces: {}", faces.len());
+    println!("Imported mesh: {}", file_path);
+    println!("Amount of faces: {}", faces.len());
     let mesh = Mesh::new(faces, transformation, material);
     Ok( mesh )
 }

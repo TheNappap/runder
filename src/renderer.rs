@@ -30,7 +30,7 @@ fn handle_threads(chunks: &mut Iterator<Item=(i32,i32)>, thread_pool: &mut Vec<A
     for thread in thread_pool.iter_mut() {
         let is_ready = thread.load(Ordering::Relaxed);
         if is_ready {
-            if let Some((w,h)) = chunks.next(){
+            if let Some((h,w)) = chunks.next(){
                 let sender_clone = Sender::clone(&sender);
                 let settings = settings.clone();
                 let scene = scene_graph.clone();
@@ -40,14 +40,14 @@ fn handle_threads(chunks: &mut Iterator<Item=(i32,i32)>, thread_pool: &mut Vec<A
 
                 std::thread::spawn( move || {
                     let mut pixels = vec![];
-                    let w = w*chunk_width;
-                    let till_w = if width-w < chunk_width {w+(width-w)} else {w+chunk_width};
+                    let h = h*chunk_height;
+                    let till_h = if height-h < chunk_height {h+(height-h)} else {h+chunk_height};
 
-                    for x in w..till_w{
-                        let h = h*chunk_height;
-                        let till_h = if height-h < chunk_height {h+(height-h)} else {h+chunk_height};
+                    for y in h..till_h{
+                        let w = w*chunk_width;
+                        let till_w = if width-w < chunk_width {w+(width-w)} else {w+chunk_width};
 
-                        for y in h..till_h{
+                        for x in w..till_w{
                             pixels.push(calucate_pixel(Pixel{x,y}, settings.aa_multi_sample, &camera, &scene));
                         }
                     }
@@ -60,12 +60,11 @@ fn handle_threads(chunks: &mut Iterator<Item=(i32,i32)>, thread_pool: &mut Vec<A
 }
 
 fn calucate_pixel(pixel: Pixel, multi_sample: i32, camera: &PerspectiveCamera, scene: &SceneGraph) -> (Pixel, Color) {
-    //let intersect;
+    let mut intersect = None;
     let rad = camera.rays_for_pixel(&pixel).iter().map(|ray|{
-        //println!("pixel: {:?}, raydir: {:?}", pixel, ray.direction());
         (scene.intersect(ray), ray.direction())
     }).map(|(int,dir)|{
-        //intersect = &int;
+        intersect = int.clone();
         match int {
             None => Radiance::zero(),
             Some(i) => scene.receive_radiance(i, dir.invert())
@@ -119,22 +118,30 @@ fn run_program_loop(settings: Arc<Settings>, camera: Arc<PerspectiveCamera>, sce
     canvas.present();
 
     let (sender, receiver) = mpsc::channel();
-    let mut thread_pool = vec![Arc::new(AtomicBool::new(true)); settings.amt_threads as usize];
-    let mut chunks = iproduct!(0..(settings.screen_width/settings.chunk_width)+1, 0..(settings.screen_height/settings.chunk_height)+1);
+    let mut thread_pool = (0..settings.amt_threads as usize).map(|_| Arc::new(AtomicBool::new(true))).collect();
+    let mut chunks = iproduct!(0..(settings.screen_height/settings.chunk_height)+1, 0..(settings.screen_width/settings.chunk_width)+1).peekable();
 
     let mut quit = false;
+    let mut done = false;
     while !quit {
-        handle_threads( &mut chunks, &mut thread_pool, &settings, &camera, &scene, &sender);
+        if !done {
+            handle_threads( &mut chunks, &mut thread_pool, &settings, &camera, &scene, &sender);
 
-        while let Ok(pixels) = receiver.try_recv(){
-            for (pixel,color) in pixels{
-                let r = (color.r()*255.0) as u8;
-                let g = (color.g()*255.0) as u8;
-                let b = (color.b()*255.0) as u8;
-                canvas.set_draw_color(sdl2::pixels::Color::RGB(r,g,b));
-                canvas.draw_point(sdl2::rect::Point::new(pixel.x,pixel.y)).unwrap();
+            while let Ok(pixels) = receiver.try_recv(){
+                for (pixel,color) in pixels{
+                    let r = (color.r()*255.0) as u8;
+                    let g = (color.g()*255.0) as u8;
+                    let b = (color.b()*255.0) as u8;
+                    canvas.set_draw_color(sdl2::pixels::Color::RGB(r,g,b));
+                    canvas.draw_point(sdl2::rect::Point::new(pixel.x,pixel.y)).unwrap();
+                }
+                canvas.present();
             }
-            canvas.present();
+
+            if chunks.peek().is_none() && thread_pool.iter().fold(true,|acc, thread| acc && thread.load(Ordering::Relaxed)) {
+                done = true;
+                println!("done");
+            }
         }
 
         let mut event_pump = sdl_context.event_pump().unwrap();

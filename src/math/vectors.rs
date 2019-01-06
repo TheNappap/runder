@@ -108,6 +108,8 @@ impl Vector {
         Vector( BaseVector::new( x, y, z ) )
     }
 
+    pub fn up() -> Vector { Vector( BaseVector::new( 0.0, 1.0, 0.0 ) ) }
+
     pub fn length(&self) -> f64 {
         (self.0*self.0).sum().sqrt()
     }
@@ -137,9 +139,9 @@ impl VectorTrait for Vector{
 impl Add<Vector> for Vector {
     type Output = Vector;
 
-    fn add(self, mut rhs: Vector) -> Vector {
-        rhs.0 = rhs.0 + self.0;
-        rhs
+    fn add(mut self, rhs: Vector) -> Vector {
+        self.0 = rhs.0 + self.0;
+        self
     }
 }
 
@@ -149,6 +151,15 @@ impl Add<Point> for Vector {
     fn add(self, mut rhs: Point) -> Point {
         rhs.0 = rhs.0 + self.0;
         rhs
+    }
+}
+
+impl Sub<Vector> for Vector {
+    type Output = Vector;
+
+    fn sub(mut self, rhs: Vector) -> Vector {
+        self.0 = self.0 - rhs.0;
+        self
     }
 }
 
