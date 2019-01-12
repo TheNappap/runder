@@ -1,7 +1,7 @@
 
 use super::{Object, Material, Plane};
 use cg_tools::{Transformation, BoundingBox, Ray};
-use math::{VectorTrait, Point, Normal};
+use math::{Point, Normal};
 use scene::Intersection;
 
 pub trait Face : Object {
@@ -44,23 +44,23 @@ impl Object for Triangle{
         let edge1 = self.vertices[1] - self.vertices[0];
         let edge2 = self.vertices[2] - self.vertices[0];
         let h = direction.cross(edge2);
-        let a = edge1.dot(&h);
+        let a = edge1.base().dot(&h.base());
         if a > -1e-12 && a < 1e-12{
             return None;
         }    // This ray is parallel to this triangle.
         let f = 1.0/a;
         let s = origin - self.vertices[0];
-        let u = f * (s.dot(&h));
+        let u = f * (s.base().dot(&h.base()));
         if u < 0.0 || u > 1.0 {
             return None;
         }
         let q = s.cross(edge1);
-        let v = f * direction.dot(&q);
+        let v = f * direction.base().dot(&q.base());
         if v < 0.0 || u + v > 1.0 {
             return None;
         }
         // At this stage we can compute t to find out where the intersection point is on the line.
-        let t = f * edge2.dot(&q);
+        let t = f * edge2.base().dot(&q.base());
         if t > 0.0 { // ray intersection
             let point = origin + t*direction;
             let normal = (edge1.cross(edge2)).normalize();
@@ -121,9 +121,9 @@ impl Object for Rectangle {
         if let Some(intersect) = self.plane.intersect_without_transformation(ray){
             let point = intersect.point();
             let bbox = self.bounding_box();
-            let between_x = point.x() >= bbox.points()[0].x() - 1e-12 && point.x() <= bbox.points()[1].x() + 1e-12;
-            let between_y = point.y() >= bbox.points()[0].y() - 1e-12 && point.y() <= bbox.points()[1].y() + 1e-12;
-            let between_z = point.z() >= bbox.points()[0].z() - 1e-12 && point.z() <= bbox.points()[1].z() + 1e-12;
+            let between_x = point.base().x >= bbox.points()[0].base().x - 1e-12 && point.base().x <= bbox.points()[1].base().x + 1e-12;
+            let between_y = point.base().y >= bbox.points()[0].base().y - 1e-12 && point.base().y <= bbox.points()[1].base().y + 1e-12;
+            let between_z = point.base().z >= bbox.points()[0].base().z - 1e-12 && point.base().z <= bbox.points()[1].base().z + 1e-12;
 
             if between_x && between_y && between_z {
                 return Some(intersect);

@@ -12,7 +12,7 @@ use std::sync::atomic::{AtomicBool,Ordering};
 use settings::Settings;
 use camera::{Pixel, PerspectiveCamera};
 use scene::{SceneGraph, Intersection};
-use math::{VectorTrait, Point};
+use math::{Point};
 use units::{Color, Radiance};
 
 pub fn render(settings: Arc<Settings>, camera: PerspectiveCamera, scene: SceneGraph){
@@ -88,7 +88,7 @@ fn normal_color_map(intersect: Option<Intersection>) -> Color{
         None => Color::black(),
         Some(intersect) => {
             let normal = (*intersect.normal().base()+1.0) / 2.0;
-            Color::new(normal.x(), normal.y(), normal.z())
+            Color::new(normal.x, normal.y, normal.z)
         }
     }
 }

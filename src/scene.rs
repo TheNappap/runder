@@ -2,7 +2,7 @@
 use std::sync::{Arc};
 use settings::Settings;
 
-use math::{VectorTrait, Point, Direction, Normal};
+use math::{Point, Direction, Normal};
 use cg_tools::{Ray,Transformation};
 use objects::{Object, Light, Material};
 use units::Radiance;
@@ -61,8 +61,8 @@ impl SceneGraph {
                 if !visible { continue }
 
                 let r = (light_point - intersection.point()).length();
-                let cos_point = intersection.normal().dot(&incoming).max(0.0);
-                let cos_light = light_normal.dot(&incoming.invert()).max(0.0);
+                let cos_point = intersection.normal().base().dot(&incoming.base()).max(0.0);
+                let cos_light = light_normal.base().dot(&incoming.invert().base()).max(0.0);
 
                 let factor = (cos_point*cos_light)/(r*r);
                 let rad_from_light = light.radiance_from_point(light_point);

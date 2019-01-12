@@ -1,5 +1,5 @@
 
-use math::{VectorTrait, Point, Normal};
+use math::{Point, Normal};
 use cg_tools::{Ray,Transformation,BoundingBox};
 use scene::Intersection;
 use objects::{Object,Material};
@@ -21,13 +21,11 @@ impl Sphere {
 
 impl Object for Sphere {
     fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
-        let center = Point::origin();
         let (origin, direction) = (ray.origin(), ray.direction());
 
-        let moved_origin = origin - center;
-        let a = direction.dot(&direction);
-        let b = 2.0*direction.dot(&moved_origin);
-        let c = moved_origin.dot(&moved_origin) - 1.0;
+        let a = direction.base().dot(&direction.base());
+        let b = 2.0*direction.base().dot(&origin.base());
+        let c = origin.base().dot(&origin.base()) - 1.0;
         let d = b*b - 4.0*a*c;
 
         let t;
@@ -50,7 +48,7 @@ impl Object for Sphere {
 
         if t > 0.0 {
             let point = origin + t*direction;
-            let normal = (point - center).normalize();
+            let normal = (point - Point::origin()).normalize();
             Some( Intersection::new(t, point, normal, self.material()) )
         }
             else { None }
@@ -84,8 +82,8 @@ impl Object for Plane {
     fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
         let (origin, direction) = (ray.origin(), ray.direction());
 
-        let nom = direction.invert().dot(&self.normal);
-        let denom = (self.point - origin).dot(&self.normal);
+        let nom = direction.invert().base().dot(&self.normal.base());
+        let denom = (self.point - origin).base().dot(&self.normal.base());
         if nom <= 0.0{
             None
         }

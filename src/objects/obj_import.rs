@@ -31,7 +31,7 @@ pub fn parse_obj(file_path: &str) -> Result<Mesh,Error> {
         Point::new(v[0], v[1], v[2])
     }).collect();
 
-    let transformation = Transformation::new().translate(Vector::new(0.0,1.0,5.0));
+    let transformation = Transformation::new().translate(Vector::new(-2.0,0.0,5.0));
     let material = Box::new(Lambertian::new(Color::gray(1.0)));
 
     let trans = transformation.clone();
@@ -44,7 +44,10 @@ pub fn parse_obj(file_path: &str) -> Result<Mesh,Error> {
             3 => Some(Box::new(Triangle::new([v[0],v[1],v[2]], trans.clone(), mat.clone())) as Box<Face>),
             4 => Some(Box::new(Rectangle::new([v[0],v[1],v[2],v[3]], trans.clone(), mat.clone())) as Box<Face>),
             x if x < 3 => None,
-            _ => None
+            x => {
+                println!("Faces with {} vertices are not supported.", x);
+                None
+            }
         }
     }).collect();
 

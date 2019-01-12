@@ -1,7 +1,7 @@
 
 use std::f64::consts::PI;
 
-use math::{VectorTrait, Normal, Point};
+use math::{Normal, Point};
 use super::{Object, Rectangle};
 use units::{Color, Radiance};
 use cg_tools::SamplingTechnique;
