@@ -7,6 +7,7 @@ mod objects;
 mod scene;
 mod settings;
 mod units;
+mod thread_pool;
 
 use std::sync::{Arc};
 use std::f64::consts::{PI,FRAC_PI_2};
@@ -26,7 +27,7 @@ fn main() {
         screen_height: 600,
         chunk_width: 80,
         chunk_height: 60,
-        amt_threads: 8,
+        amt_threads: 6,
         aa_multi_sample: 1,
         light_sampling_technique: SamplingTechnique::Stratified{multi_sample: 1, seed: 0.0}
     };
@@ -48,12 +49,12 @@ fn default_camera(settings: Arc<Settings>) -> PerspectiveCamera
 
 fn default_scene(settings: Arc<Settings>) -> SceneGraph{
     let mut scene_graph = SceneGraph::new(settings);
-    //scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(0.0,0.0,3.0)), Box::new(Lambertian::new(Color::new(1.0,0.0,0.0))) )));
-    //scene_graph.add_object(Box::new(Sphere::new(Transformation::new().scale(2.0,1.0,1.0).translate(Vector::new(2.0,0.0,4.0)),Box::new(Lambertian::new(Color::new(0.0,1.0,1.0))) )));
-    //scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(-2.0,0.0,4.0)),Box::new(Lambertian::new(Color::gray(0.50))) )));
+    scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(0.0,0.0,3.0)), Box::new(Lambertian::new(Color::new(1.0,0.0,0.0))) )));
+    scene_graph.add_object(Box::new(Sphere::new(Transformation::new().scale(2.0,1.0,1.0).translate(Vector::new(2.0,0.0,4.0)),Box::new(Lambertian::new(Color::new(0.0,1.0,1.0))) )));
+    scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(-2.0,0.0,4.0)),Box::new(Lambertian::new(Color::gray(0.50))) )));
     scene_graph.add_object(Box::new(Plane::new(Point::new(0.0,-1.0,0.0), Vector::new(0.0,1.0,0.0), Transformation::new(), Box::new(Lambertian::new(Color::gray(1.0))) )));
-    //scene_graph.add_object(Box::new(Rectangle::unit_square(Transformation::new().scale_all(4.0).rotate(RotationAxis::Xaxis, -FRAC_PI_2).translate(Vector::new(0.0,-1.0,6.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
-    //scene_graph.add_object(Box::new(BoxObject::new(Point::new(1.0,1.0,1.0), Transformation::new().translate(Vector::new(-4.0,2.0,4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
+    scene_graph.add_object(Box::new(Rectangle::unit_square(Transformation::new().scale_all(4.0).rotate(RotationAxis::Xaxis, -FRAC_PI_2).translate(Vector::new(0.0,-1.0,6.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
+    scene_graph.add_object(Box::new(BoxObject::new(Point::new(1.0,1.0,1.0), Transformation::new().translate(Vector::new(-4.0,2.0,4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
     let mesh = parse_obj("obj\\chair\\chair.obj").expect("Could not read obj");
     //let mesh = parse_obj("obj\\diamond.obj").expect("Could not read obj");
     scene_graph.add_object(Box::new(mesh));
