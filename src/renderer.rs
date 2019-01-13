@@ -56,16 +56,14 @@ fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool,
                 }
             }
             sender_clone.send(ChunkFinished::Chunk(pixels)).unwrap();
-
-            println!("Elapsed {}.{}",now.elapsed().as_secs(), now.elapsed().subsec_millis());
-            println!("Sent");
         });
     }
 
     for index in 0..thread_pool.amt_threads() {
         let sender_clone = Sender::clone(&sender);
-        thread_pool.terminate_thread(index);
-        sender_clone.send(ChunkFinished::Done).unwrap();
+        thread_pool.finish( move || {
+            sender_clone.send(ChunkFinished::Done).unwrap();
+        });
     }
 }
 
@@ -133,24 +131,21 @@ fn run_program_loop(settings: Arc<Settings>, camera: Arc<PerspectiveCamera>, sce
     let (sender, receiver) = mpsc::channel();
     let mut thread_pool = ThreadPool::new(settings.amt_threads);
     let mut chunks = iproduct!(0..(settings.screen_height/settings.chunk_height)+1, 0..(settings.screen_width/settings.chunk_width)+1).peekable();
-    init_threads( &mut chunks, &mut thread_pool, &settings, &camera, &scene, &sender);
-    //Drop thread pool after initializing threads. Threads will first execute before terminating.
-    let terminate_thread_pool = |pool: ThreadPool| {};
-    terminate_thread_pool(thread_pool);
+    init_threads(&mut chunks, &mut thread_pool, &settings, &camera, &scene, &sender);
+    thread_pool.finish_jobs();
 
     let mut quit = false;
     let mut done = 0;
     while !quit {
         if done < settings.amt_threads {
             while let Ok(chunk_finished) = receiver.try_recv(){
-                println!("Received");
                 match chunk_finished {
                     ChunkFinished::Done => {
                         done += 1;
                         if done == settings.amt_threads {
                             let elapsed = now.elapsed();
                             println!("Done.");
-                            println!("Elapsed {}.{}s", elapsed.as_secs(), elapsed.subsec_millis());
+                            println!("Elapsed time {}.{}s", elapsed.as_secs(), elapsed.subsec_millis());
                         }
                     },
                     ChunkFinished::Chunk(pixels) => {

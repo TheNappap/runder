@@ -17,11 +17,12 @@ type Job = Box<FnBox + Send + 'static>;
 
 enum ThreadMessage {
     NewJob(Job),
+    Finish(Job),
     Terminate
 }
 
 struct Thread {
-    index: usize,
+    _index: usize,
     thread_join: Option<thread::JoinHandle<()>>
 }
 
@@ -33,18 +34,19 @@ impl Thread {
 
                 match message {
                     ThreadMessage::NewJob(job) =>{
-                        //println!("Thread {} started executing job.", index);
                         job.call();
-                        //println!("Thread {} finished job.", index);
+                    },
+                    ThreadMessage::Finish(job) => {
+                        job.call();
+                        break;
                     },
                     ThreadMessage::Terminate => {
-                        //println!("Thread {} terminated.", index);
                         break;
                     }
                 }
             }
         });
-        Thread{index, thread_join: Some(thread_join) }
+        Thread{_index: index, thread_join: Some(thread_join) }
     }
 }
 
@@ -78,8 +80,16 @@ impl ThreadPool {
         self.sender.send(ThreadMessage::NewJob(job)).unwrap();
     }
 
-    pub fn terminate_thread(&self, index: usize) {
-        self.sender.send(ThreadMessage::Terminate).unwrap();
+    pub fn finish<F>(&self, job: F) where F : FnOnce() + Send + 'static {
+        let job = Box::new(job);
+
+        self.sender.send(ThreadMessage::Finish(job)).unwrap();
+    }
+
+    pub fn finish_jobs(self) {
+        thread::spawn(move ||{
+           let sink = self;
+        });
     }
 }
 
