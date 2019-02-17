@@ -1,7 +1,7 @@
 
 use super::{Object, Material, Plane};
 use cg_tools::{Transformation, BoundingBox, Ray};
-use math::{Point, Normal};
+use math::{Point, Normal, EPSILON};
 use scene::Intersection;
 
 pub trait Face : Object {
@@ -15,13 +15,14 @@ pub trait Face : Object {
 #[derive(Debug)]
 pub struct Triangle {
     vertices : [Point; 3],
+    double_sided: bool,
     transformation : Transformation,
     material : Box<Material>
 }
 
 impl Triangle{
-    pub fn new(vertices : [Point; 3], transformation : Transformation, material: Box<Material>) -> Triangle{
-        Triangle{vertices, transformation, material}
+    pub fn new(vertices : [Point; 3], double_sided: bool, transformation : Transformation, material: Box<Material>) -> Triangle{
+        Triangle{vertices, double_sided, transformation, material}
     }
 }
 
@@ -33,7 +34,7 @@ impl Face for Triangle {
     }
 
     fn double_sided(&self) -> bool {
-        unimplemented!()
+        self.double_sided
     }
 }
 
@@ -44,11 +45,11 @@ impl Object for Triangle{
         let edge1 = self.vertices[1] - self.vertices[0];
         let edge2 = self.vertices[2] - self.vertices[0];
         let h = direction.cross(&edge2);
-        let a = edge1.dot(&h);
-        if a > -1e-12 && a < 1e-12{
+        let det = edge1.dot(&h);
+        if (!self.double_sided || det > -EPSILON) && det < EPSILON {
             return None;
-        }    // This ray is parallel to this triangle.
-        let f = 1.0/a;
+        }
+        let f = 1.0/det;
         let s = origin - self.vertices[0];
         let u = f * (s.dot(&h));
         if u < 0.0 || u > 1.0 {
@@ -59,12 +60,13 @@ impl Object for Triangle{
         if v < 0.0 || u + v > 1.0 {
             return None;
         }
-        // At this stage we can compute t to find out where the intersection point is on the line.
         let t = f * edge2.dot(&q);
-        println!("t {}", t);
-        if t > 0.0 { // ray intersection
+        if t > 0.0 {
             let point = origin + t**direction;
-            let normal = Normal::from(edge1.cross(&edge2));
+            let mut normal = Normal::from(edge1.cross(&edge2));
+            if det < EPSILON {
+                normal = normal.invert();
+            }
             let int = Intersection::new(t, point, normal, self.material());
             Some(int)
         }
@@ -90,15 +92,15 @@ pub struct Rectangle {
 impl Rectangle{
     pub fn unit_square(transformation: Transformation, material: Box<Material>) -> Rectangle{
         let points = [Point::origin(), Point::new(1.0,0.0, 0.0), Point::new(1.0,0.0, 1.0), Point::new(0.0,0.0, 1.0)];
-        Rectangle{ plane: Plane::new(points[0], Normal::new(0.0, 1.0, 0.0), transformation, material), points}
+        Rectangle{ plane: Plane::new(points[0], Normal::new(0.0, 1.0, 0.0), true, transformation, material), points}
     }
 
-    pub fn new(vertices : [Point; 4], transformation: Transformation, material: Box<Material>) -> Rectangle{
+    pub fn new(vertices : [Point; 4], double_sided: bool, transformation: Transformation, material: Box<Material>) -> Rectangle{
         let edge1 = vertices[1] - vertices[0];
         let edge2 = vertices[3] - vertices[0];
         let normal = Normal::from(edge1.cross(&edge2));
 
-        Rectangle{ plane: Plane::new(vertices[0], normal, transformation, material), points: vertices}
+        Rectangle{ plane: Plane::new(vertices[0], normal, double_sided,transformation, material), points: vertices}
     }
 
     pub fn plane(&self) -> &Plane { &self.plane }
@@ -113,7 +115,7 @@ impl Face for Rectangle {
     }
 
     fn double_sided(&self) -> bool {
-        unimplemented!()
+        self.plane.double_sided()
     }
 }
 
@@ -122,9 +124,9 @@ impl Object for Rectangle {
         if let Some(intersect) = self.plane.intersect_without_transformation(ray){
             let point = intersect.point();
             let bbox = self.bounding_box();
-            let between_x = point.x >= bbox.points()[0].x - 1e-12 && point.x <= bbox.points()[1].x + 1e-12;
-            let between_y = point.y >= bbox.points()[0].y - 1e-12 && point.y <= bbox.points()[1].y + 1e-12;
-            let between_z = point.z >= bbox.points()[0].z - 1e-12 && point.z <= bbox.points()[1].z + 1e-12;
+            let between_x = point.x >= bbox.points()[0].x - EPSILON && point.x <= bbox.points()[1].x + EPSILON;
+            let between_y = point.y >= bbox.points()[0].y - EPSILON && point.y <= bbox.points()[1].y + EPSILON;
+            let between_z = point.z >= bbox.points()[0].z - EPSILON && point.z <= bbox.points()[1].z + EPSILON;
 
             if between_x && between_y && between_z {
                 return Some(intersect);

@@ -83,7 +83,7 @@ fn calucate_pixel(pixel: Pixel, multi_sample: u32, camera: &PerspectiveCamera, s
 
     let color = radiance_color_map(rad);
     //let color = normal_color_map(intersect);
-    //let color = distance_color_map(intersect, camera.position());
+    //let color = distance_color_map(intersect, camera.position(), 2.);
     (pixel,color)
 }
 
@@ -101,11 +101,11 @@ fn normal_color_map(intersect: Option<Intersection>) -> Color{
     }
 }
 
-fn distance_color_map(intersect: Option<Intersection>, camera_position: Point) -> Color{
+fn distance_color_map(intersect: Option<Intersection>, camera_position: Point, factor: f64) -> Color{
     match intersect {
         None => Color::black(),
         Some(intersect) => {
-            let distance = (intersect.point() - camera_position).length();
+            let distance = (intersect.point() - camera_position).length() / factor;
             Color::gray(1.0/distance)
         }
     }

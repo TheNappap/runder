@@ -1,5 +1,5 @@
 
-use math::{Point, Normal};
+use math::{Point, Normal, EPSILON};
 use cg_tools::{Ray,Transformation,BoundingBox};
 use scene::Intersection;
 use objects::{Object,Material};
@@ -68,14 +68,17 @@ impl Object for Sphere {
 pub struct Plane {
     point : Point,
     normal: Normal,
+    double_sided: bool,
     transformation: Transformation,
     material : Box<Material>
 }
 
 impl Plane{
-    pub fn new(point : Point, normal: Normal, transformation: Transformation, material: Box<Material>) -> Plane{
-        Plane{point, normal, transformation, material}
+    pub fn new(point : Point, normal: Normal, double_sided: bool, transformation: Transformation, material: Box<Material>) -> Plane{
+        Plane{point, normal, double_sided, transformation, material}
     }
+
+    pub fn double_sided(&self) -> bool { self.double_sided }
 }
 
 impl Object for Plane {
@@ -84,14 +87,16 @@ impl Object for Plane {
 
         let nom = direction.invert().dot(&self.normal);
         let denom = (self.point - origin).dot(&self.normal);
-        if nom <= 0.0{
+        if (!self.double_sided || nom > -EPSILON) && nom < EPSILON {
             None
         }
         else {
+            let normal = if nom < 0.0 { self.normal.invert() } else { self.normal };
             let t = -denom/nom;
-            if t == 0.0 { return None }
+            if t < 0.0 { return None }
             let point = origin + t**direction;
-            let int = Intersection::new(t, point, self.normal, self.material());
+            let int = Intersection::new(t, point, normal, self.material());
+            //println!("Normal: {:?}", normal);
             Some(int)
         }
     }

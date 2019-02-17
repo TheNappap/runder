@@ -1,5 +1,5 @@
 
-use math::{Point, Direction, Normal};
+use math::{Point, Direction, Normal, EPSILON};
 
 //////////////////
 //Ray
@@ -69,11 +69,11 @@ impl BoundingBox {
         let t = tmin;
         if t <= 0.0 { return None }let point = origin + t**direction;
         let normal = match (t, point) {
-            (t,p) if t == txmin && p.x.abs() < 1e-12 => Normal::new(-1.0,0.0,0.0),
+            (t,p) if t == txmin && p.x.abs() < EPSILON => Normal::new(-1.0, 0.0, 0.0),
             (t,_) if t == txmin => Normal::new(1.0,0.0,0.0),
-            (t,p) if t == tymin && p.y.abs() < 1e-12 => Normal::new(0.0,-1.0,0.0),
+            (t,p) if t == tymin && p.y.abs() < EPSILON => Normal::new(0.0, -1.0, 0.0),
             (t,_) if t == tymin => Normal::new(0.0,1.0,0.0),
-            (t,p) if t == tzmin && p.z.abs() < 1e-12 => Normal::new(0.0,0.0,-1.0),
+            (t,p) if t == tzmin && p.z.abs() < EPSILON => Normal::new(0.0, 0.0, -1.0),
             (t,_) if t == tzmin => Normal::new(0.0,0.0,1.0),
             _ => Normal::new(0.0,0.0,0.0)
         };

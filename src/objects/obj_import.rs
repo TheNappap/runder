@@ -41,8 +41,8 @@ pub fn parse_obj(file_path: &str) -> Result<Mesh,Error> {
             .map(|s| s.parse().expect("Unable to convert String to usize") )
             .map(|index: usize| vertices.get(index-1).unwrap() ).cloned().collect();
         match v.len() {
-            3 => Some(Box::new(Triangle::new([v[0],v[1],v[2]], trans.clone(), mat.clone())) as Box<Face>),
-            4 => Some(Box::new(Rectangle::new([v[0],v[1],v[2],v[3]], trans.clone(), mat.clone())) as Box<Face>),
+            3 => Some(Box::new(Triangle::new([v[0],v[1],v[2]], false,trans.clone(), mat.clone())) as Box<Face>),
+            4 => Some(Box::new(Rectangle::new([v[0],v[1],v[2],v[3]], false,trans.clone(), mat.clone())) as Box<Face>),
             x if x < 3 => None,
             x => {
                 println!("Faces with {} vertices are not supported.", x);
