@@ -4,7 +4,7 @@ use std::ops::{Add,Sub,Mul,Div};
 //////////////////
 //BaseVector
 //////////////////
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Default)]
 pub struct BaseVector {
     pub x: f64,
     pub y: f64,

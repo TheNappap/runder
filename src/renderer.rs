@@ -95,7 +95,7 @@ fn normal_color_map(intersect: Option<Intersection>) -> Color{
     match intersect {
         None => Color::black(),
         Some(intersect) => {
-            let normal = (*intersect.normal().base()+1.0) / 2.0;
+            let normal = (**intersect.normal()+1.0) / 2.0;
             Color::new(normal.x, normal.y, normal.z)
         }
     }
@@ -135,14 +135,14 @@ fn run_program_loop(settings: Arc<Settings>, camera: Arc<PerspectiveCamera>, sce
     thread_pool.finish_jobs();
 
     let mut quit = false;
-    let mut done = 0;
+    let mut finished_jobs = 0;
     while !quit {
-        if done < settings.amt_threads {
+        if finished_jobs < settings.amt_threads {
             while let Ok(chunk_finished) = receiver.try_recv(){
                 match chunk_finished {
                     ChunkFinished::Done => {
-                        done += 1;
-                        if done == settings.amt_threads {
+                        finished_jobs += 1;
+                        if finished_jobs == settings.amt_threads {
                             let elapsed = now.elapsed();
                             println!("Done.");
                             println!("Elapsed time {}.{}s", elapsed.as_secs(), elapsed.subsec_millis());

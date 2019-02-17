@@ -1,5 +1,5 @@
 
-use std::ops::{Add,Sub,Mul};
+use std::ops::{Add,Sub,Mul,Deref};
 use std::f64;
 
 use super::base_vector::BaseVector;
@@ -7,14 +7,10 @@ use super::base_vector::BaseVector;
 //////////////////
 //Point
 //////////////////
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Default)]
 pub struct Point(BaseVector);
 
 impl Point {
-    pub fn from_base(base: BaseVector) -> Point
-    {
-        Point( base )
-    }
     pub fn origin() -> Point { Point( BaseVector::new(0.0, 0.0,0.0 ) ) }
     pub fn new(x: f64, y: f64, z: f64) -> Point
     {
@@ -25,20 +21,26 @@ impl Point {
         Point(BaseVector::from_value(f64::MIN))
     }
 
-    pub fn base(&self) -> &BaseVector { &self.0 }
-
     pub fn max(&self, other: Point) -> Point {
-        Point::new(self.base().x.max(other.base().x), self.base().y.max(other.base().y),self.base().z.max(other.base().z))
+        Point::new(self.x.max(other.x), self.y.max(other.y),self.z.max(other.z))
     }
 
     pub fn min(&self, other: Point) -> Point {
-        Point::new(self.base().x.min(other.base().x), self.base().y.min(other.base().y),self.base().z.min(other.base().z))
+        Point::new(self.x.min(other.x), self.y.min(other.y),self.z.min(other.z))
     }
 }
 
 impl From<BaseVector> for Point {
     fn from(base: BaseVector) -> Self {
         Point( base )
+    }
+}
+
+impl Deref for Point {
+    type Target = BaseVector;
+
+    fn deref(&self) -> &BaseVector {
+       &self.0
     }
 }
 
@@ -90,23 +92,15 @@ impl Mul<Point> for f64{
 //////////////////
 //Vector
 //////////////////
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Default)]
 pub struct Vector(BaseVector);
-pub type Direction = Vector;
-pub type Normal = Vector;
 
 impl Vector {
-    pub fn from_base(base: BaseVector) -> Vector
-    {
-        Vector( base )
-    }
     pub fn new(x: f64, y: f64, z: f64) -> Vector
     {
         Vector( BaseVector::new( x, y, z ) )
     }
     pub fn up() -> Vector { Vector( BaseVector::new( 0.0, 1.0, 0.0 ) ) }
-
-    pub fn base(&self) -> &BaseVector { &self.0 }
 
     pub fn length(&self) -> f64 {
         (self.0*self.0).sum().sqrt()
@@ -124,10 +118,10 @@ impl Vector {
         self
     }
 
-    pub fn cross(self, other: Vector) -> Vector {
-        let x = self.base().y*other.base().z - self.base().z*other.base().y;
-        let y = self.base().z*other.base().x - self.base().x*other.base().z;
-        let z = self.base().x*other.base().y - self.base().y*other.base().x;
+    pub fn cross(&self, other: &Vector) -> Vector {
+        let x = self.y*other.z - self.z*other.y;
+        let y = self.z*other.x - self.x*other.z;
+        let z = self.x*other.y - self.y*other.x;
         Vector(BaseVector{x,y,z})
     }
 }
@@ -135,6 +129,14 @@ impl Vector {
 impl From<BaseVector> for Vector {
     fn from(base: BaseVector) -> Self {
         Vector( base )
+    }
+}
+
+impl Deref for Vector {
+    type Target = BaseVector;
+
+    fn deref(&self) -> &BaseVector {
+        &self.0
     }
 }
 
@@ -180,5 +182,73 @@ impl Mul<Vector> for f64{
     fn mul(self, mut rhs: Vector) -> Vector {
         rhs.0 = rhs.0*self;
         rhs
+    }
+}
+
+//////////////////
+//Direction
+//////////////////
+#[derive(Copy, Clone, Debug, PartialEq, Default)]
+pub struct Direction(Vector);
+
+impl Direction {
+    pub fn new(x: f64, y: f64, z: f64) -> Direction { Direction( Vector::new( x, y, z ).normalize() ) }
+    pub fn up() -> Direction { Direction( Vector::new( 0.0, 1.0, 0.0 ) ) }
+    pub fn posz() -> Direction { Direction( Vector::new( 0.0, 0.0, 1.0 ) ) }
+    pub fn negz() -> Direction { Direction( Vector::new( 0.0, 0.0, -1.0 ) ) }
+
+    pub fn invert(mut self) -> Direction {
+        Direction(self.0.invert())
+    }
+
+    pub fn cross(&self, other: &Vector) -> Direction {
+        Direction::from(self.0.cross(other))
+    }
+}
+
+impl From<Vector> for Direction {
+    fn from(vector: Vector) -> Self {
+        Direction( vector.normalize() )
+    }
+}
+
+impl Deref for Direction {
+    type Target = Vector;
+
+    fn deref(&self) -> &Vector {
+        &self.0
+    }
+}
+
+//////////////////
+//Normal
+//////////////////
+#[derive(Copy, Clone, Debug, PartialEq, Default)]
+pub struct Normal(Vector);
+
+impl Normal {
+    pub fn new(x: f64, y: f64, z: f64) -> Normal { Normal( Vector::new( x, y, z ).normalize() ) }
+    pub fn up() -> Normal { Normal( Vector::new( 0.0, 1.0, 0.0 ) ) }
+
+    pub fn invert(mut self) -> Normal {
+        Normal(self.0.invert())
+    }
+
+    pub fn cross(&self, other: &Vector) -> Normal {
+        Normal::from(self.0.cross(other))
+    }
+}
+
+impl From<Vector> for Normal {
+    fn from(vector: Vector) -> Self {
+        Normal( vector.normalize() )
+    }
+}
+
+impl Deref for Normal {
+    type Target = Vector;
+
+    fn deref(&self) -> &Vector {
+        &self.0
     }
 }

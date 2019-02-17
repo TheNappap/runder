@@ -34,7 +34,7 @@ impl SceneGraph {
     }
 
     pub fn visible(&self, from: Point, to: Point) -> bool {
-        let dir = (to - from).normalize();
+        let dir = Direction::from(to - from);
         let distance = dir.length();
         let ray = Ray::new(from, dir);
         for object in &self.objects {
@@ -54,15 +54,15 @@ impl SceneGraph {
             let light_points = light.light_points(self.settings.light_sampling_technique);
             let amount = light_points.len();
             for (light_point, opt_normal) in light_points{
-                let incoming = (light_point - intersection.point()).normalize();
-                let light_normal = match opt_normal { Some(n) => n, None => incoming.invert() };
+                let incoming = Direction::from(light_point - intersection.point());
+                let light_normal = match opt_normal { Some(n) => n, None => Normal::from(*incoming.invert()) };
 
-                let visible = self.visible(intersection.point() + 1.0e-12*intersection.normal(), light_point + 1.0e-12*light_normal);
+                let visible = self.visible(intersection.point() + 1.0e-12**intersection.normal(), light_point + 1.0e-12**light_normal);
                 if !visible { continue }
 
                 let r = (light_point - intersection.point()).length();
-                let cos_point = intersection.normal().base().dot(&incoming.base()).max(0.0);
-                let cos_light = light_normal.base().dot(&incoming.invert().base()).max(0.0);
+                let cos_point = intersection.normal().dot(&incoming).max(0.0);
+                let cos_light = light_normal.dot(&incoming.invert()).max(0.0);
 
                 let factor = (cos_point*cos_light)/(r*r);
                 let rad_from_light = light.radiance_from_point(light_point);
@@ -96,10 +96,10 @@ impl<'a> Intersection<'a>{
     pub fn material(&self) -> &'a Material { self.material }
 
     pub fn transform(mut self, transformation: &Transformation) -> Intersection<'a> {
-        let v = self.t*self.normal();
+        let v = self.t**self.normal();
         self.t = (transformation.matrix()*v).length();
         self.point = transformation.matrix()*self.point;
-        self.normal = (&transformation.inverted().transpose()*self.normal).normalize();
+        self.normal = Normal::from( &transformation.inverted().transpose()**self.normal );
         self
     }
 

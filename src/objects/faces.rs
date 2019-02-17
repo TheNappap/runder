@@ -43,27 +43,28 @@ impl Object for Triangle{
         let (origin, direction) = (ray.origin(), ray.direction());
         let edge1 = self.vertices[1] - self.vertices[0];
         let edge2 = self.vertices[2] - self.vertices[0];
-        let h = direction.cross(edge2);
-        let a = edge1.base().dot(&h.base());
+        let h = direction.cross(&edge2);
+        let a = edge1.dot(&h);
         if a > -1e-12 && a < 1e-12{
             return None;
         }    // This ray is parallel to this triangle.
         let f = 1.0/a;
         let s = origin - self.vertices[0];
-        let u = f * (s.base().dot(&h.base()));
+        let u = f * (s.dot(&h));
         if u < 0.0 || u > 1.0 {
             return None;
         }
-        let q = s.cross(edge1);
-        let v = f * direction.base().dot(&q.base());
+        let q = s.cross(&edge1);
+        let v = f * direction.dot(&q);
         if v < 0.0 || u + v > 1.0 {
             return None;
         }
         // At this stage we can compute t to find out where the intersection point is on the line.
-        let t = f * edge2.base().dot(&q.base());
+        let t = f * edge2.dot(&q);
+        println!("t {}", t);
         if t > 0.0 { // ray intersection
-            let point = origin + t*direction;
-            let normal = (edge1.cross(edge2)).normalize();
+            let point = origin + t**direction;
+            let normal = Normal::from(edge1.cross(&edge2));
             let int = Intersection::new(t, point, normal, self.material());
             Some(int)
         }
@@ -95,7 +96,7 @@ impl Rectangle{
     pub fn new(vertices : [Point; 4], transformation: Transformation, material: Box<Material>) -> Rectangle{
         let edge1 = vertices[1] - vertices[0];
         let edge2 = vertices[3] - vertices[0];
-        let normal = edge1.cross(edge2).normalize();
+        let normal = Normal::from(edge1.cross(&edge2));
 
         Rectangle{ plane: Plane::new(vertices[0], normal, transformation, material), points: vertices}
     }
@@ -121,9 +122,9 @@ impl Object for Rectangle {
         if let Some(intersect) = self.plane.intersect_without_transformation(ray){
             let point = intersect.point();
             let bbox = self.bounding_box();
-            let between_x = point.base().x >= bbox.points()[0].base().x - 1e-12 && point.base().x <= bbox.points()[1].base().x + 1e-12;
-            let between_y = point.base().y >= bbox.points()[0].base().y - 1e-12 && point.base().y <= bbox.points()[1].base().y + 1e-12;
-            let between_z = point.base().z >= bbox.points()[0].base().z - 1e-12 && point.base().z <= bbox.points()[1].base().z + 1e-12;
+            let between_x = point.x >= bbox.points()[0].x - 1e-12 && point.x <= bbox.points()[1].x + 1e-12;
+            let between_y = point.y >= bbox.points()[0].y - 1e-12 && point.y <= bbox.points()[1].y + 1e-12;
+            let between_z = point.z >= bbox.points()[0].z - 1e-12 && point.z <= bbox.points()[1].z + 1e-12;
 
             if between_x && between_y && between_z {
                 return Some(intersect);

@@ -2,7 +2,7 @@
 use std::ops::{Mul};
 use std::fmt;
 
-use super::{Point, Vector};
+use super::{Point, Vector, Direction, Normal};
 
 #[derive(Copy, Clone, PartialEq)]
 pub struct Matrix {
@@ -31,9 +31,9 @@ impl Matrix {
 
     pub fn translated(vector: Vector) -> Matrix {
         let mut new = Self::identiy();
-        new.base[0][3] = vector.base().x;
-        new.base[1][3] = vector.base().y;
-        new.base[2][3] = vector.base().z;
+        new.base[0][3] = vector.x;
+        new.base[1][3] = vector.y;
+        new.base[2][3] = vector.z;
         new
     }
 
@@ -107,11 +107,26 @@ impl Mul<Vector> for &Matrix {
     type Output = Vector;
 
     fn mul(self, rhs: Vector) -> Vector {
-        let base = rhs.base();
-        let x = self.base[0][0]*base.x + self.base[0][1]*base.y + self.base[0][2]*base.z;
-        let y = self.base[1][0]*base.x + self.base[1][1]*base.y + self.base[1][2]*base.z;
-        let z = self.base[2][0]*base.x + self.base[2][1]*base.y + self.base[2][2]*base.z;
+        let x = self.base[0][0]*rhs.x + self.base[0][1]*rhs.y + self.base[0][2]*rhs.z;
+        let y = self.base[1][0]*rhs.x + self.base[1][1]*rhs.y + self.base[1][2]*rhs.z;
+        let z = self.base[2][0]*rhs.x + self.base[2][1]*rhs.y + self.base[2][2]*rhs.z;
         Vector::new(x,y,z)
+    }
+}
+
+impl Mul<Direction> for &Matrix {
+    type Output = Direction;
+
+    fn mul(self, rhs: Direction) -> Direction {
+        Direction::from(self**rhs)
+    }
+}
+
+impl Mul<Normal> for &Matrix {
+    type Output = Normal;
+
+    fn mul(self, rhs: Normal) -> Normal {
+        Normal::from(self**rhs)
     }
 }
 
@@ -119,11 +134,10 @@ impl Mul<Point> for &Matrix {
     type Output = Point;
 
     fn mul(self, rhs: Point) -> Point {
-        let base = rhs.base();
-        let w = self.base[3][0]*base.x + self.base[3][1]*base.y + self.base[3][2]*base.z + self.base[3][3];
-        let x = (self.base[0][0]*base.x + self.base[0][1]*base.y + self.base[0][2]*base.z + self.base[0][3]) / w;
-        let y = (self.base[1][0]*base.x + self.base[1][1]*base.y + self.base[1][2]*base.z + self.base[1][3]) / w;
-        let z = (self.base[2][0]*base.x + self.base[2][1]*base.y + self.base[2][2]*base.z + self.base[2][3]) / w;
+        let w = self.base[3][0]*rhs.x + self.base[3][1]*rhs.y + self.base[3][2]*rhs.z + self.base[3][3];
+        let x = (self.base[0][0]*rhs.x + self.base[0][1]*rhs.y + self.base[0][2]*rhs.z + self.base[0][3]) / w;
+        let y = (self.base[1][0]*rhs.x + self.base[1][1]*rhs.y + self.base[1][2]*rhs.z + self.base[1][3]) / w;
+        let z = (self.base[2][0]*rhs.x + self.base[2][1]*rhs.y + self.base[2][2]*rhs.z + self.base[2][3]) / w;
         Point::new(x,y,z)
     }
 }

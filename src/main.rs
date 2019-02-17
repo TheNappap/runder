@@ -16,7 +16,7 @@ use settings::Settings;
 use objects::*;
 use camera::{PerspectiveCamera};
 use scene::{SceneGraph};
-use math::{Point, Vector, RotationAxis};
+use math::{Point, Vector, Normal, Direction, RotationAxis};
 use cg_tools::{SamplingTechnique,Transformation};
 use units::Color;
 
@@ -41,9 +41,9 @@ fn main() {
 
 fn default_camera(settings: Arc<Settings>) -> PerspectiveCamera
 {
-    let position = math::Point::new(0.0,2.0,-2.0);
-    let direction = math::Direction::new(0.0,-1.0,5.0);
-    let up = math::Direction::up();
+    let position = Point::new(0.0,2.0,-2.0);
+    let direction = Direction::new(0.0,-1.0,5.0);
+    let up = Direction::up();
     PerspectiveCamera::new(settings, position,direction,up,60.0)
 }
 
@@ -52,12 +52,13 @@ fn default_scene(settings: Arc<Settings>) -> SceneGraph{
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(0.0,0.0,3.0)), Box::new(Lambertian::new(Color::new(1.0,0.0,0.0))) )));
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().scale(2.0,1.0,1.0).translate(Vector::new(2.0,0.0,4.0)),Box::new(Lambertian::new(Color::new(0.0,1.0,1.0))) )));
     scene_graph.add_object(Box::new(Sphere::new(Transformation::new().translate(Vector::new(-2.0,0.0,4.0)),Box::new(Lambertian::new(Color::gray(0.50))) )));
-    scene_graph.add_object(Box::new(Plane::new(Point::new(0.0,-1.0,0.0), Vector::new(0.0,1.0,0.0), Transformation::new(), Box::new(Lambertian::new(Color::gray(1.0))) )));
+    scene_graph.add_object(Box::new(Plane::new(Point::new(0.0,-1.0,0.0), Normal::new(0.0,1.0,0.0), Transformation::new(), Box::new(Lambertian::new(Color::gray(1.0))) )));
+    scene_graph.add_object(Box::new(Triangle::new([Point::new(1.0,1.0,0.0),Point::new(-1.0,1.0,0.0),Point::new(-1.0,5.0,2.0)],Transformation::new(),Box::new(Lambertian::new(Color::gray(1.0))) )));
     scene_graph.add_object(Box::new(Rectangle::unit_square(Transformation::new().scale_all(4.0).rotate(RotationAxis::Xaxis, -FRAC_PI_2).translate(Vector::new(0.0,-1.0,6.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
     scene_graph.add_object(Box::new(BoxObject::new(Point::new(1.0,1.0,1.0), Transformation::new().translate(Vector::new(-4.0,2.0,4.0)), Box::new(Lambertian::new(Color::gray(1.0))) )));
     let mesh = parse_obj("obj\\chair\\chair.obj").expect("Could not read obj");
     //let mesh = parse_obj("obj\\diamond.obj").expect("Could not read obj");
-    scene_graph.add_object(Box::new(mesh));
+    //scene_graph.add_object(Box::new(mesh));
 
     //let position = math::Point::new(0.0,8.0,0.0);
     let position = math::Point::new(-2.0,2.0,0.0);

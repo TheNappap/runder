@@ -23,9 +23,9 @@ impl Object for Sphere {
     fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
         let (origin, direction) = (ray.origin(), ray.direction());
 
-        let a = direction.base().dot(&direction.base());
-        let b = 2.0*direction.base().dot(&origin.base());
-        let c = origin.base().dot(&origin.base()) - 1.0;
+        let a = direction.dot(&direction);
+        let b = 2.0*direction.dot(&origin);
+        let c = origin.dot(&origin) - 1.0;
         let d = b*b - 4.0*a*c;
 
         let t;
@@ -47,8 +47,8 @@ impl Object for Sphere {
         }
 
         if t > 0.0 {
-            let point = origin + t*direction;
-            let normal = (point - Point::origin()).normalize();
+            let point = origin + t**direction;
+            let normal = Normal::from(point - Point::origin());
             Some( Intersection::new(t, point, normal, self.material()) )
         }
             else { None }
@@ -82,15 +82,15 @@ impl Object for Plane {
     fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
         let (origin, direction) = (ray.origin(), ray.direction());
 
-        let nom = direction.invert().base().dot(&self.normal.base());
-        let denom = (self.point - origin).base().dot(&self.normal.base());
+        let nom = direction.invert().dot(&self.normal);
+        let denom = (self.point - origin).dot(&self.normal);
         if nom <= 0.0{
             None
         }
         else {
             let t = -denom/nom;
             if t == 0.0 { return None }
-            let point = origin + t*direction;
+            let point = origin + t**direction;
             let int = Intersection::new(t, point, self.normal, self.material());
             Some(int)
         }
