@@ -96,7 +96,6 @@ impl Object for Plane {
             if t < 0.0 { return None }
             let point = origin + t**direction;
             let int = Intersection::new(t, point, normal, self.material());
-            //println!("Normal: {:?}", normal);
             Some(int)
         }
     }

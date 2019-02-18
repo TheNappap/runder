@@ -95,10 +95,9 @@ impl<'a> Intersection<'a>{
     pub fn normal(&self) -> Normal { self.normal }
     pub fn material(&self) -> &'a Material { self.material }
 
-    pub fn transform(mut self, transformation: &Transformation) -> Intersection<'a> {
-        let v = self.t**self.normal();
-        self.t = (transformation.matrix()*v).length();
+    pub fn transform(mut self, transformation: &Transformation, ray: &Ray) -> Intersection<'a> {
         self.point = transformation.matrix()*self.point;
+        self.t = (self.point - ray.origin()).length();
         self.normal = Normal::from( &transformation.inverted().transpose()**self.normal );
         self
     }

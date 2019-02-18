@@ -105,7 +105,8 @@ fn distance_color_map(intersect: Option<Intersection>, camera_position: Point, f
     match intersect {
         None => Color::black(),
         Some(intersect) => {
-            let distance = (intersect.point() - camera_position).length() / factor;
+            //let distance = (intersect.point() - camera_position).length() / factor;
+            let distance = intersect.t() / factor;
             Color::gray(1.0/distance)
         }
     }
