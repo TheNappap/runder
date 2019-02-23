@@ -2,7 +2,7 @@
 use std::sync::{Arc};
 use settings::Settings;
 
-use math::{Point, Direction, Normal};
+use math::{Point, Vector, Direction, Normal, EPSILON};
 use cg_tools::{Ray,Transformation};
 use objects::{Object, Light, Material};
 use units::Radiance;
@@ -34,14 +34,16 @@ impl SceneGraph {
     }
 
     pub fn visible(&self, from: Point, to: Point) -> bool {
-        let dir = Direction::from(to - from);
+        let dir = to - from;
         let distance = dir.length();
-        let ray = Ray::new(from, dir);
+        let ray = Ray::new(from, Direction::from(dir));
         for object in &self.objects {
             let opt_int = object.intersect( &ray );
             if let Some(intersect) = opt_int {
                 let dist = (intersect.point() - from).length();
-                if dist < distance { return false; }
+                if dist < distance {
+                    return false;
+                }
             }
         }
         true
@@ -57,7 +59,7 @@ impl SceneGraph {
                 let incoming = Direction::from(light_point - intersection.point());
                 let light_normal = match opt_normal { Some(n) => n, None => Normal::from(*incoming.invert()) };
 
-                let visible = self.visible(intersection.point() + 1.0e-12**intersection.normal(), light_point + 1.0e-12**light_normal);
+                let visible = self.visible(light_point + EPSILON**light_normal, intersection.point() + EPSILON**intersection.normal());
                 if !visible { continue }
 
                 let r = (light_point - intersection.point()).length();
