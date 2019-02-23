@@ -197,7 +197,7 @@ impl Direction {
     pub fn posz() -> Direction { Direction( Vector::new( 0.0, 0.0, 1.0 ) ) }
     pub fn negz() -> Direction { Direction( Vector::new( 0.0, 0.0, -1.0 ) ) }
 
-    pub fn invert(mut self) -> Direction {
+    pub fn invert(self) -> Direction {
         Direction(self.0.invert())
     }
 

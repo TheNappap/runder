@@ -44,27 +44,27 @@ impl Object for Triangle{
         let (origin, direction) = (ray.origin(), ray.direction());
         let edge1 = self.vertices[1] - self.vertices[0];
         let edge2 = self.vertices[2] - self.vertices[0];
-        let h = direction.cross(&edge2);
+        let h = (*direction).cross(&edge2);
         let det = edge1.dot(&h);
         if (!self.double_sided || det > -EPSILON) && det < EPSILON {
             return None;
         }
-        let f = 1.0/det;
+        let inv_det = 1.0/det;
         let s = origin - self.vertices[0];
-        let u = f * (s.dot(&h));
+        let u = inv_det * (s.dot(&h));
         if u < 0.0 || u > 1.0 {
             return None;
         }
         let q = s.cross(&edge1);
-        let v = f * direction.dot(&q);
+        let v = inv_det * direction.dot(&q);
         if v < 0.0 || u + v > 1.0 {
             return None;
         }
-        let t = f * edge2.dot(&q);
+        let t = inv_det * edge2.dot(&q);
         if t > 0.0 {
             let point = origin + t**direction;
             let mut normal = Normal::from(edge1.cross(&edge2));
-            if det < EPSILON {
+            if det < 0. {
                 normal = normal.invert();
             }
             let int = Intersection::new(t, point, normal, self.material());

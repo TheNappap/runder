@@ -4,11 +4,10 @@ extern crate itertools;
 
 use self::itertools::iproduct;
 use std::iter::Iterator;
-use std::time::{Duration, Instant};
+use std::time::{Instant};
 
 use std::sync::{mpsc, Arc};
 use std::sync::mpsc::{Sender};
-use std::sync::atomic::{AtomicBool,Ordering};
 
 use settings::Settings;
 use thread_pool::{ThreadPool};
@@ -40,7 +39,6 @@ fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool,
         let settings = settings.clone();
         let scene = scene_graph.clone();
         let camera = camera.clone();
-        let now = Instant::now();
 
         thread_pool.execute( move || {
             let mut pixels = Vec::new();
@@ -59,7 +57,7 @@ fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool,
         });
     }
 
-    for index in 0..thread_pool.amt_threads() {
+    for _ in 0..thread_pool.amt_threads() {
         let sender_clone = Sender::clone(&sender);
         thread_pool.finish( move || {
             sender_clone.send(ChunkFinished::Done).unwrap();

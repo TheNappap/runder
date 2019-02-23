@@ -6,7 +6,7 @@ use std::sync::{Arc};
 use std::f64::consts::{PI};
 
 use settings::Settings;
-use math::{Point, Direction, Vector};
+use math::{Point, Direction};
 use cg_tools::Ray;
 
 #[derive(Clone, Debug)]

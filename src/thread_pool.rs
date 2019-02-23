@@ -88,7 +88,7 @@ impl ThreadPool {
 
     pub fn finish_jobs(self) {
         thread::spawn(move ||{
-           let sink = self;
+           let _sink = self;
         });
     }
 }

@@ -4,7 +4,7 @@ use std::io::{Error, BufReader, BufRead};
 use std::f64;
 
 use super::{Rectangle, Triangle, Mesh, Face, Lambertian};
-use math::{Point, Vector, RotationAxis};
+use math::{Point, Vector};
 use units::Color;
 use cg_tools::Transformation;
 
