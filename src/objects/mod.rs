@@ -16,17 +16,23 @@ use cg_tools::{Ray, Transformation, BoundingBox};
 use scene::Intersection;
 
 pub trait Object : Send + Sync {
-    fn intersect(&self, ray: &Ray) -> Option<Intersection>{
-        let transformation = self.transformation();
-        let transformed_ray = Ray::new(transformation.inverted()*ray.origin(), transformation.inverted()*ray.direction() );
-        match self.intersect_without_transformation(&transformed_ray) {
-            None => None,
-            Some(int) => Some(int.transform(self.transformation(), &ray))
-        }
+    fn as_ref(&self) -> &Object;
+
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        intersect_impl(self.as_ref(), &ray)
     }
 
     fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection>;
     fn transformation(&self) -> &Transformation;
     fn bounding_box(&self) -> &BoundingBox;
     fn material(&self) -> &Material;
+}
+
+fn intersect_impl<'a,'b>(object: &'a Object, ray: &'b Ray) -> Option<Intersection<'a>> {
+    let transformation = object.transformation();
+    let transformed_ray = Ray::new(transformation.inverted()*ray.origin(), transformation.inverted()*ray.direction() );
+    match object.intersect_without_transformation(&transformed_ray) {
+        None => None,
+        Some(int) => Some(int.transform(object.transformation(), &ray))
+    }
 }

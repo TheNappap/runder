@@ -2,7 +2,7 @@
 use std::sync::{Arc};
 use settings::Settings;
 
-use math::{Point, Vector, Direction, Normal, EPSILON};
+use math::{Point, Direction, Normal, EPSILON};
 use cg_tools::{Ray,Transformation};
 use objects::{Object, Light, Material};
 use units::Radiance;

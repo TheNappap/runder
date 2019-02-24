@@ -230,7 +230,7 @@ impl Normal {
     pub fn new(x: f64, y: f64, z: f64) -> Normal { Normal( Vector::new( x, y, z ).normalize() ) }
     pub fn up() -> Normal { Normal( Vector::new( 0.0, 1.0, 0.0 ) ) }
 
-    pub fn invert(mut self) -> Normal {
+    pub fn invert(self) -> Normal {
         Normal(self.0.invert())
     }
 

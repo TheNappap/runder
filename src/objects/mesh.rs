@@ -3,6 +3,7 @@ use super::{Face, Material, Object};
 use cg_tools::{BoundingBox, Transformation, Ray};
 use math::{Point};
 use scene::Intersection;
+use objects;
 
 //////////////////
 //Mesh
@@ -16,23 +17,29 @@ pub struct Mesh {
 
 impl Mesh{
     pub fn new(faces: Vec<Box<Face>>, transformation : Transformation, material: Box<Material>) -> Mesh{
-        let (min,max) = faces.iter().map(|f| f.bounding_box()).fold((Point::max_point(),Point::min_point()), |acc, bbox:BoundingBox|{
-            let points = bbox.points();
-            (points[0].min(acc.0), points[1].max(acc.1))
+        let (min,max) = faces.iter().map(|f| f.bounding_box()).fold((Point::max_point(),Point::min_point()), |acc, bbox|{
+            (bbox.min().min(acc.0), bbox.max().max(acc.1))
         });
-        let bbox = BoundingBox::new([min,max]);
+        let bbox = BoundingBox::new(min,max);
         Mesh{faces, bbox, transformation, material}
-    }
-
-    pub fn bounding_box(&self) -> &BoundingBox {
-        &self.bbox
     }
 }
 
 impl Object for Mesh{
-    fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
-        if self.bounding_box().intersect(ray).is_none() { return None}
+    fn as_ref(&self) -> &Object {
+        self
+    }
 
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        if self.bounding_box().intersect(ray).is_none() {
+            None
+        }
+        else {
+            objects::intersect_impl(self, ray)
+        }
+    }
+
+    fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
         self.faces.iter().map(|f|{
             f.intersect_without_transformation(ray)
         }).fold(None, |acc, opt_int : Option<Intersection>|{
@@ -48,6 +55,8 @@ impl Object for Mesh{
     }
 
     fn transformation(&self) -> &Transformation { &self.transformation }
+
+    fn bounding_box(&self) -> &BoundingBox { &self.bbox }
 
     fn material(&self) -> &Material { self.material.as_ref() }
 }
