@@ -81,4 +81,10 @@ impl BoundingBox {
         };
         Some((t,point,normal))
     }
+
+    pub fn contains(&self, point: Point) -> bool {
+        self.min.x >= point.x && self.max.x <= point.x
+            && self.min.y >= point.y && self.max.y <= point.y
+            && self.min.z >= point.z && self.max.z <= point.z
+    }
 }
