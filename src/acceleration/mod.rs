@@ -1,11 +1,13 @@
 mod bvh;
 
+pub use self::bvh::BoundingVolumeHierarchy;
+
 use cg_tools::Ray;
 use math::{Point, Direction};
 use scene::Intersection;
 use objects::Object;
 
-pub trait AccelerationStructure {
+pub trait AccelerationStructure : Send + Sync {
     fn intersect(&self, ray: &Ray) -> Option<Intersection>;
     fn visible(&self, from: Point, to: Point) -> bool;
 }
@@ -15,10 +17,7 @@ pub struct BruteForce{
 }
 
 impl BruteForce {
-    pub fn new() -> BruteForce { BruteForce{objects: Vec::new()} }
-    pub fn add_object(&mut self, object : Box<Object>){
-        self.objects.push(object);
-    }
+    pub fn new(objects: Vec<Box<Object>>) -> BruteForce { BruteForce{objects} }
 }
 
 impl AccelerationStructure for BruteForce {

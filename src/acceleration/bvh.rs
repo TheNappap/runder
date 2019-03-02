@@ -5,17 +5,74 @@ use cg_tools::{Ray, BoundingBox};
 use math::{Point, Direction};
 use scene::Intersection;
 
+enum Axis {
+    XAxis,
+    YAxis,
+    ZAxis
+}
+
 enum BVHNode {
     Composite(Box<BoundingVolumeHierarchy>,Box<BoundingVolumeHierarchy>),
     Leaf(Vec<Box<Object>>)
 }
 
-struct BoundingVolumeHierarchy {
+pub struct BoundingVolumeHierarchy {
     bbox: BoundingBox,
     node: BVHNode
 }
 
 impl BoundingVolumeHierarchy {
+
+    pub fn new(objects: Vec<Box<Object>>) -> BoundingVolumeHierarchy {
+        BoundingVolumeHierarchy::split_objects(objects, &Axis::XAxis)
+    }
+
+    fn leaf(objects: Vec<Box<Object>>) -> BoundingVolumeHierarchy{
+        let bbox = objects.iter().map(|o|{
+            o.bounding_box()
+        }).fold(BoundingBox::new(Point::max_point(), Point::min_point()), |acc, bbox|{
+            acc.union(&bbox)
+        });
+        BoundingVolumeHierarchy{bbox, node: BVHNode::Leaf(objects)}
+    }
+
+    fn composite(objects1: Vec<Box<Object>>, objects2: Vec<Box<Object>>, split_axis: Axis) -> BoundingVolumeHierarchy{
+        let bvh1 = BoundingVolumeHierarchy::split_objects(objects1, &split_axis);
+        let bvh2 = BoundingVolumeHierarchy::split_objects(objects2, &split_axis);
+        let bbox = bvh1.bbox.union(&bvh2.bbox);
+        BoundingVolumeHierarchy{bbox, node: BVHNode::Composite(Box::new(bvh1), Box::new(bvh2))}
+    }
+
+    fn split_objects(mut objects: Vec<Box<Object>>, split_axis: &Axis) -> BoundingVolumeHierarchy {
+        if objects.len() < 4 {
+            return BoundingVolumeHierarchy::leaf(objects);
+        }
+
+        objects.sort_by(|a,b|{
+            let bbox1 = a.bounding_box();
+            let bbox2 = b.bounding_box();
+            if let Some(ord) = bbox1.min().x.partial_cmp(&bbox2.min().x) {
+                ord
+            }
+            else { std::cmp::Ordering::Equal }
+        });
+
+        let chunk_size = (objects.len() + 1) / 2; //round up
+        let (objects1, objects2): (Vec<Box<Object>>,Vec<Box<Object>>) = objects.drain(..).enumerate()
+            .fold( (Vec::new(),Vec::new()),|(mut vec1,mut vec2), (i,o)|{
+            if i < chunk_size { vec1.push(o); }
+            else { vec2.push(o); }
+            (vec1,vec2)
+        });
+
+        let next_split_axis = match *split_axis {
+            Axis::XAxis => Axis::YAxis,
+            Axis::YAxis => Axis::ZAxis,
+            Axis::ZAxis => Axis::XAxis,
+        };
+        BoundingVolumeHierarchy::composite(objects1, objects2, next_split_axis)
+    }
+
     fn intersect_node(&self, ray: &Ray) -> Option<Intersection> {
         match &self.node {
             BVHNode::Composite(bvh1, bvh2) =>{

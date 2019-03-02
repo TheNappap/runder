@@ -32,6 +32,7 @@ impl BoundingBox {
     pub fn new(min: Point, max: Point) -> BoundingBox{
         BoundingBox{min, max}
     }
+
     pub fn new_from_origin(corner_point: Point) -> BoundingBox{
         let min = corner_point.min(Point::origin());
         let max = corner_point.max(Point::origin());
@@ -41,8 +42,25 @@ impl BoundingBox {
     pub fn min(&self) -> Point { self.min }
     pub fn max(&self) -> Point { self.max }
 
+    pub fn union(&self, bounds: &BoundingBox) -> BoundingBox {
+        let min = bounds.min.min(self.min);
+        let max = bounds.max.max(self.max);
+
+        BoundingBox{min, max}
+    }
+
+    pub fn contains(&self, point: &Point) -> bool {
+        self.min.x <= point.x && self.max.x >= point.x
+            && self.min.y <= point.y && self.max.y >= point.y
+            && self.min.z <= point.z && self.max.z >= point.z
+    }
+
     pub fn intersect(&self, ray: &Ray) -> Option<(f64, Point, Normal)> {
         let (origin, direction) = (ray.origin(), ray.direction());
+        if self.contains(&origin) {
+            return Some((0.,origin,Normal::from(*direction.invert())));
+        }
+
         let mut txmin = (self.min.x - origin.x) / direction.x;
         let mut txmax = (self.max.x - origin.x) / direction.x;
 
@@ -80,11 +98,5 @@ impl BoundingBox {
             _ => Normal::new(0.0,0.0,0.0)
         };
         Some((t,point,normal))
-    }
-
-    pub fn contains(&self, point: Point) -> bool {
-        self.min.x >= point.x && self.max.x <= point.x
-            && self.min.y >= point.y && self.max.y <= point.y
-            && self.min.z >= point.z && self.max.z <= point.z
     }
 }

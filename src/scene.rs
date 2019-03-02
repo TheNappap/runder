@@ -10,22 +10,14 @@ use acceleration::{AccelerationStructure, BruteForce};
 
 pub struct SceneGraph{
     settings: Arc<Settings>,
-    acc_structure: BruteForce,
+    acc_structure: Box<AccelerationStructure>,
     lights : Vec<Box<Light>>
 }
 
 impl SceneGraph {
 
-    pub fn new(settings: Arc<Settings>) -> SceneGraph{
-        SceneGraph{settings, acc_structure: BruteForce::new(), lights: Vec::new()}
-    }
-
-    pub fn add_object(&mut self, object : Box<Object>){
-        self.acc_structure.add_object(object);
-    }
-
-    pub fn add_light(&mut self, light : Box<Light>){
-        self.lights.push(light);
+    pub fn new(settings: Arc<Settings>, acc_structure: Box<AccelerationStructure>, lights : Vec<Box<Light>>) -> SceneGraph{
+        SceneGraph{settings, acc_structure, lights}
     }
 
     pub fn intersect(&self, ray: &Ray) -> Option<Intersection> {
