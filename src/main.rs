@@ -29,6 +29,7 @@ fn main() {
         screen_height: 600,
         chunk_width: 80,
         chunk_height: 60,
+        gamma: 2.2,
         amt_threads: 6,
         aa_multi_sample: 1,
         light_sampling_technique: SamplingTechnique::Stratified{multi_sample: 1, seed: 0.0}

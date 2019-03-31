@@ -103,4 +103,11 @@ impl Color {
         let b =  rad.b().min(1.0);
         Color{r, g, b}
     }
+
+    pub fn gamma_correct(&mut self, gamma: f64) {
+        let inv_gamma = 1./gamma;
+        self.r = self.r.powf(inv_gamma);
+        self.g = self.g.powf(inv_gamma);
+        self.b = self.b.powf(inv_gamma);
+    }
 }

@@ -50,7 +50,7 @@ fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool,
                 let till_w = if width-w < chunk_width {w+(width-w)} else {w+chunk_width};
 
                 for x in w..till_w{
-                    pixels.push(calucate_pixel(Pixel{x: x as i32,y: y as i32}, settings.aa_multi_sample, &camera, &scene));
+                    pixels.push(calucate_pixel(Pixel{x: x as i32,y: y as i32}, settings.as_ref(), &camera, &scene));
                 }
             }
             sender_clone.send(ChunkFinished::Chunk(pixels)).unwrap();
@@ -65,7 +65,7 @@ fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool,
     }
 }
 
-fn calucate_pixel(pixel: Pixel, multi_sample: u32, camera: &PerspectiveCamera, scene: &SceneGraph) -> (Pixel, Color) {
+fn calucate_pixel(pixel: Pixel, settings: &Settings, camera: &PerspectiveCamera, scene: &SceneGraph) -> (Pixel, Color) {
     let mut intersect = None;
     let rad = camera.rays_for_pixel(&pixel).iter().map(|ray|{
         (scene.intersect(ray), ray.direction())
@@ -77,16 +77,18 @@ fn calucate_pixel(pixel: Pixel, multi_sample: u32, camera: &PerspectiveCamera, s
         }
     }).fold(Radiance::zero(), |acc,rad|{
         acc + rad
-    }) * (1.0/(multi_sample*multi_sample) as f64);
+    }) * (1.0/(settings.aa_multi_sample.pow(2)) as f64);
 
-    let color = radiance_color_map(rad);
+    let color = radiance_color_map(rad, settings.gamma);
     //let color = normal_color_map(intersect);
     //let color = distance_color_map(intersect, camera.position(), 2.);
     (pixel,color)
 }
 
-fn radiance_color_map(rad: Radiance ) -> Color{
-    Color::radiance_to_color(rad)
+fn radiance_color_map(rad: Radiance, gamma: f64) -> Color{
+    let mut color = Color::radiance_to_color(rad);
+    color.gamma_correct(gamma);
+    color
 }
 
 fn normal_color_map(intersect: Option<Intersection>) -> Color{
