@@ -24,32 +24,52 @@ impl Ray {
 //////////////////
 #[derive(Debug)]
 pub struct BoundingBox {
-    points : [Point;2],
+    min: Point,
+    max: Point
 }
 
 impl BoundingBox {
-    pub fn new(points: [Point;2]) -> BoundingBox{
-        BoundingBox{points}
-    }
-    pub fn new_from_origin(corner_point: Point) -> BoundingBox{
-        BoundingBox{points: [Point::origin(), corner_point]}
+    pub fn new(min: Point, max: Point) -> BoundingBox{
+        BoundingBox{min, max}
     }
 
-    pub fn points(&self) -> [Point;2] {
-        self.points
+    pub fn new_from_origin(corner_point: Point) -> BoundingBox{
+        let min = corner_point.min(Point::origin());
+        let max = corner_point.max(Point::origin());
+        BoundingBox{min, max}
+    }
+
+    pub fn min(&self) -> Point { self.min }
+    pub fn max(&self) -> Point { self.max }
+
+    pub fn union(&self, bounds: &BoundingBox) -> BoundingBox {
+        let min = bounds.min.min(self.min);
+        let max = bounds.max.max(self.max);
+
+        BoundingBox{min, max}
+    }
+
+    pub fn contains(&self, point: &Point) -> bool {
+        self.min.x <= point.x && self.max.x >= point.x
+            && self.min.y <= point.y && self.max.y >= point.y
+            && self.min.z <= point.z && self.max.z >= point.z
     }
 
     pub fn intersect(&self, ray: &Ray) -> Option<(f64, Point, Normal)> {
         let (origin, direction) = (ray.origin(), ray.direction());
-        let mut txmin = (self.points[0].x - origin.x) / direction.x;
-        let mut txmax = (self.points[1].x - origin.x) / direction.x;
+        if self.contains(&origin) {
+            return Some((0.,origin,Normal::from(*direction.invert())));
+        }
+
+        let mut txmin = (self.min.x - origin.x) / direction.x;
+        let mut txmax = (self.max.x - origin.x) / direction.x;
 
         if txmin > txmax { std::mem::swap(&mut txmin, &mut txmax) }
         let mut tmin = txmin;
         let mut tmax = txmax;
 
-        let mut tymin = (self.points[0].y - origin.y) / direction.y;
-        let mut tymax = (self.points[1].y - origin.y) / direction.y;
+        let mut tymin = (self.min.y - origin.y) / direction.y;
+        let mut tymax = (self.max.y - origin.y) / direction.y;
 
         if tymin > tymax { std::mem::swap(&mut tymin, &mut tymax) }
         if (tmin > tymax) || (tymin > tmax) { return None; }
@@ -57,8 +77,8 @@ impl BoundingBox {
         if tymin > tmin { tmin = tymin; }
         if tymax < tmax { tmax = tymax; }
 
-        let mut tzmin = (self.points[0].z - origin.z) / direction.z;
-        let mut tzmax = (self.points[1].z - origin.z) / direction.z;
+        let mut tzmin = (self.min.z - origin.z) / direction.z;
+        let mut tzmax = (self.max.z - origin.z) / direction.z;
 
         if tzmin > tzmax { std::mem::swap(&mut tzmin, &mut tzmax) }
         if (tmin > tzmax) || (tzmin > tmax) { return None; }

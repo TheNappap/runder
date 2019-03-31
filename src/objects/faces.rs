@@ -1,11 +1,10 @@
 
 use super::{Object, Material, Plane};
 use cg_tools::{Transformation, BoundingBox, Ray};
-use math::{Point, Normal, EPSILON};
+use math::{Point, Normal, Matrix, EPSILON};
 use scene::Intersection;
 
 pub trait Face : Object {
-    fn bounding_box(&self) -> BoundingBox;
     fn double_sided(&self) -> bool;
 }
 
@@ -17,28 +16,31 @@ pub struct Triangle {
     vertices : [Point; 3],
     double_sided: bool,
     transformation : Transformation,
+    bbox: BoundingBox,
     material : Box<Material>
 }
 
 impl Triangle{
     pub fn new(vertices : [Point; 3], double_sided: bool, transformation : Transformation, material: Box<Material>) -> Triangle{
-        Triangle{vertices, double_sided, transformation, material}
+        let tf_points = [transformation.matrix()*vertices[0],transformation.matrix()*vertices[1],transformation.matrix()*vertices[2]];
+        let min = tf_points[0].min(tf_points[1]).min(tf_points[2]);
+        let max = tf_points[0].max(tf_points[1]).max(tf_points[2]);
+        let bbox = BoundingBox::new(min,max);
+        Triangle{vertices, double_sided, transformation, bbox, material}
     }
 }
 
 impl Face for Triangle {
-    fn bounding_box(&self) -> BoundingBox {
-        let min = self.vertices[0].min(self.vertices[1]).min(self.vertices[2]);
-        let max = self.vertices[0].max(self.vertices[1]).max(self.vertices[2]);
-        BoundingBox::new([min,max])
-    }
-
     fn double_sided(&self) -> bool {
         self.double_sided
     }
 }
 
 impl Object for Triangle{
+    fn as_ref(&self) -> &Object {
+        self
+    }
+
     //Möller–Trumbore
     fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
         let (origin, direction) = (ray.origin(), ray.direction());
@@ -77,6 +79,8 @@ impl Object for Triangle{
 
     fn transformation(&self) -> &Transformation { &self.transformation }
 
+    fn bounding_box(&self) -> &BoundingBox { &self.bbox }
+
     fn material(&self) -> &Material { self.material.as_ref() }
 }
 
@@ -86,47 +90,58 @@ impl Object for Triangle{
 #[derive(Debug)]
 pub struct Rectangle {
     plane : Plane,
-    points: [Point; 4]
+    points: [Point; 4],
+    bbox: BoundingBox
 }
 
 impl Rectangle{
-    pub fn unit_square(transformation: Transformation, material: Box<Material>) -> Rectangle{
+    pub fn unit_square(transformation: Transformation, double_sided: bool, material: Box<Material>) -> Rectangle{
         let points = [Point::origin(), Point::new(1.0,0.0, 0.0), Point::new(1.0,0.0, 1.0), Point::new(0.0,0.0, 1.0)];
-        Rectangle{ plane: Plane::new(points[0], Normal::new(0.0, 1.0, 0.0), true, transformation, material), points}
+        let bbox = Rectangle::bbox(points, transformation.matrix());
+        let plane= Plane::new(points[0], Normal::new(0.0, 1.0, 0.0), double_sided, transformation, material);
+        Rectangle{ plane , points, bbox}
     }
 
-    pub fn new(vertices : [Point; 4], double_sided: bool, transformation: Transformation, material: Box<Material>) -> Rectangle{
-        let edge1 = vertices[1] - vertices[0];
-        let edge2 = vertices[3] - vertices[0];
+    pub fn new(points : [Point; 4], double_sided: bool, transformation: Transformation, material: Box<Material>) -> Rectangle{
+        let edge1 = points[1] - points[0];
+        let edge2 = points[3] - points[0];
         let normal = Normal::from(edge1.cross(&edge2));
 
-        Rectangle{ plane: Plane::new(vertices[0], normal, double_sided,transformation, material), points: vertices}
+        let bbox = Rectangle::bbox(points, transformation.matrix());
+        let plane= Plane::new(points[0], normal, double_sided, transformation, material);
+        Rectangle{ plane, points, bbox }
     }
 
     pub fn plane(&self) -> &Plane { &self.plane }
     pub fn points(&self) -> [Point; 4] { self.points }
+
+    fn bbox(points : [Point; 4], tf_matrix: &Matrix) -> BoundingBox {
+        let tf_points = [tf_matrix*points[0],tf_matrix*points[1],tf_matrix*points[2],tf_matrix*points[3]];
+        let min = tf_points[0].min(tf_points[1]).min(tf_points[2]).min(tf_points[3]);
+        let max = tf_points[0].max(tf_points[1]).max(tf_points[2]).max(tf_points[3]);
+        BoundingBox::new(min,max)
+    }
 }
 
 impl Face for Rectangle {
-    fn bounding_box(&self) -> BoundingBox {
-        let min = self.points[0].min(self.points[2]);
-        let max = self.points[0].max(self.points[2]);
-        BoundingBox::new([min,max])
-    }
-
     fn double_sided(&self) -> bool {
         self.plane.double_sided()
     }
 }
 
 impl Object for Rectangle {
+    fn as_ref(&self) -> &Object {
+        self
+    }
+
     fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
         if let Some(intersect) = self.plane.intersect_without_transformation(ray){
             let point = intersect.point();
-            let bbox = self.bounding_box();
-            let between_x = point.x >= bbox.points()[0].x - EPSILON && point.x <= bbox.points()[1].x + EPSILON;
-            let between_y = point.y >= bbox.points()[0].y - EPSILON && point.y <= bbox.points()[1].y + EPSILON;
-            let between_z = point.z >= bbox.points()[0].z - EPSILON && point.z <= bbox.points()[1].z + EPSILON;
+            let identity = Matrix::identiy();
+            let bbox = Rectangle::bbox(self.points, &identity);
+            let between_x = point.x >= bbox.min().x - EPSILON && point.x <= bbox.max().x + EPSILON;
+            let between_y = point.y >= bbox.min().y - EPSILON && point.y <= bbox.max().y + EPSILON;
+            let between_z = point.z >= bbox.min().z - EPSILON && point.z <= bbox.max().z + EPSILON;
 
             if between_x && between_y && between_z {
                 return Some(intersect);
@@ -136,6 +151,8 @@ impl Object for Rectangle {
     }
 
     fn transformation(&self) -> &Transformation { self.plane.transformation() }
+
+    fn bounding_box(&self) -> &BoundingBox {&self.bbox }
 
     fn material(&self) -> &Material { self.plane.material() }
 }

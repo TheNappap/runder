@@ -3,37 +3,47 @@ use super::{Face, Material, Object};
 use cg_tools::{BoundingBox, Transformation, Ray};
 use math::{Point};
 use scene::Intersection;
+use objects;
+use acceleration::{AccelerationStructure, BoundingVolumeHierarchy};
 
 //////////////////
 //Mesh
 //////////////////
 pub struct Mesh {
-    faces : Vec<Box<Face>>,
+    faces : Box<AccelerationStructure>,
     bbox: BoundingBox,
     transformation : Transformation,
     material : Box<Material>
 }
 
 impl Mesh{
-    pub fn new(faces: Vec<Box<Face>>, transformation : Transformation, material: Box<Material>) -> Mesh{
-        let (min,max) = faces.iter().map(|f| f.bounding_box()).fold((Point::max_point(),Point::min_point()), |acc, bbox:BoundingBox|{
-            let points = bbox.points();
-            (points[0].min(acc.0), points[1].max(acc.1))
+    pub fn new(faces: Vec<Box<Object>>, transformation : Transformation, material: Box<Material>) -> Mesh{
+        let bbox = faces.iter().map(|f| f.bounding_box())
+            .fold(BoundingBox::new(Point::max_point(), Point::min_point()), |acc, bbox|{
+            acc.union(&bbox)
         });
-        let bbox = BoundingBox::new([min,max]);
-        Mesh{faces, bbox, transformation, material}
-    }
-
-    pub fn bounding_box(&self) -> &BoundingBox {
-        &self.bbox
+        let acc_structure = Box::new(BoundingVolumeHierarchy::new(faces));
+        Mesh{faces: acc_structure, bbox, transformation, material}
     }
 }
 
 impl Object for Mesh{
-    fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
-        if self.bounding_box().intersect(ray).is_none() { return None}
+    fn as_ref(&self) -> &Object {
+        self
+    }
 
-        self.faces.iter().map(|f|{
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        if self.bounding_box().intersect(ray).is_none() {
+            None
+        }
+        else {
+            objects::intersect_impl(self, ray)
+        }
+    }
+
+    fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
+        self.faces.intersect(ray)
+        /*self.faces.iter().map(|f|{
             f.intersect_without_transformation(ray)
         }).fold(None, |acc, opt_int : Option<Intersection>|{
             match opt_int {
@@ -44,10 +54,12 @@ impl Object for Mesh{
                 }
                     else { Some(int) }
             }
-        })
+        })*/
     }
 
     fn transformation(&self) -> &Transformation { &self.transformation }
+
+    fn bounding_box(&self) -> &BoundingBox { &self.bbox }
 
     fn material(&self) -> &Material { self.material.as_ref() }
 }

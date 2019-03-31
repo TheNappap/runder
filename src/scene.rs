@@ -2,51 +2,30 @@
 use std::sync::{Arc};
 use settings::Settings;
 
-use math::{Point, Vector, Direction, Normal, EPSILON};
+use math::{Point, Direction, Normal, EPSILON};
 use cg_tools::{Ray,Transformation};
 use objects::{Object, Light, Material};
 use units::Radiance;
+use acceleration::{AccelerationStructure, BruteForce};
 
 pub struct SceneGraph{
     settings: Arc<Settings>,
-    objects : Vec<Box<Object>>,
+    acc_structure: Box<AccelerationStructure>,
     lights : Vec<Box<Light>>
 }
 
 impl SceneGraph {
 
-    pub fn new(settings: Arc<Settings>) -> SceneGraph{
-        SceneGraph{settings, objects: Vec::new(), lights: Vec::new()}
-    }
-
-    pub fn add_object(&mut self, object : Box<Object>){
-        self.objects.push(object);
-    }
-
-    pub fn add_light(&mut self, light : Box<Light>){
-        self.lights.push(light);
+    pub fn new(settings: Arc<Settings>, acc_structure: Box<AccelerationStructure>, lights : Vec<Box<Light>>) -> SceneGraph{
+        SceneGraph{settings, acc_structure, lights}
     }
 
     pub fn intersect(&self, ray: &Ray) -> Option<Intersection> {
-        self.objects.iter()
-            .map(|o| o.intersect( ray ) )
-            .fold(None, Intersection::closest_intersection)
+        self.acc_structure.intersect(ray)
     }
 
     pub fn visible(&self, from: Point, to: Point) -> bool {
-        let dir = to - from;
-        let distance = dir.length();
-        let ray = Ray::new(from, Direction::from(dir));
-        for object in &self.objects {
-            let opt_int = object.intersect( &ray );
-            if let Some(intersect) = opt_int {
-                let dist = (intersect.point() - from).length();
-                if dist < distance {
-                    return false;
-                }
-            }
-        }
-        true
+        self.acc_structure.visible(from, to)
     }
 
     pub fn receive_radiance(&self, intersection: Intersection, outgoing: Direction) -> Radiance{
