@@ -3,8 +3,7 @@ use std::f64::consts::PI;
 
 use math::{Normal, Point};
 use super::{Object, Rectangle};
-use units::{Color, Radiance};
-use cg_tools::SamplingTechnique;
+use cg_tools::{Color, Radiance, SamplingTechnique};
 
 pub trait Light : Send + Sync{
     fn light_points(&self, sampling_technique: SamplingTechnique) -> Vec<(Point,Option<Normal>)>;
@@ -31,7 +30,7 @@ impl Light for PointLight {
     fn radiance_from_point(&self, _: Point) -> Radiance {
         let factor = self.power / (4.0*PI);
         let rad = Radiance::gray(factor);
-        rad.apply_color(self.color)
+        rad*Radiance::from(self.color)
     }
 }
 
@@ -65,7 +64,7 @@ impl Light for SurfaceLight {
     fn radiance_from_point(&self, _: Point) -> Radiance {
         let factor = self.power / (2.0*PI);
         let rad = Radiance::gray(factor);
-        rad.apply_color(self.color)
+        rad*Radiance::from(self.color)
     }
 
 }

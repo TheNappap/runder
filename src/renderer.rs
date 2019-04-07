@@ -14,7 +14,7 @@ use thread_pool::{ThreadPool};
 use camera::{Pixel, PerspectiveCamera};
 use scene::{SceneGraph, Intersection};
 use math::{Point};
-use units::{Color, Radiance};
+use cg_tools::{Color, Radiance};
 
 pub fn render(settings: Arc<Settings>, camera: PerspectiveCamera, scene: SceneGraph){
     let camera = Arc::new(camera);
@@ -86,7 +86,7 @@ fn calucate_pixel(pixel: Pixel, settings: &Settings, camera: &PerspectiveCamera,
 }
 
 fn radiance_color_map(rad: Radiance, gamma: f64) -> Color{
-    let mut color = Color::radiance_to_color(rad);
+    let mut color = Color::from(rad);
     color.gamma_correct(gamma);
     color
 }

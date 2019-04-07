@@ -3,9 +3,8 @@ use std::sync::{Arc};
 use settings::Settings;
 
 use math::{Point, Direction, Normal, EPSILON};
-use cg_tools::{Ray,Transformation};
+use cg_tools::{Ray,Transformation,Radiance};
 use objects::{Object, Light, Material};
-use units::Radiance;
 use acceleration::{AccelerationStructure, BruteForce};
 
 pub struct SceneGraph{
@@ -48,7 +47,7 @@ impl SceneGraph {
                 let factor = (cos_point*cos_light)/(r*r);
                 let rad_from_light = light.radiance_from_point(light_point);
                 let brdf = intersection.material.brdf(incoming, outgoing);
-                rad = rad + factor*rad_from_light.apply_color(brdf);
+                rad = rad + factor*(rad_from_light*Radiance::from(brdf));
             }
 
             radiance = radiance + rad*(1.0/amount as f64);

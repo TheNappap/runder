@@ -7,7 +7,6 @@ mod camera;
 mod objects;
 mod scene;
 mod settings;
-mod units;
 mod thread_pool;
 
 use std::sync::{Arc};
@@ -18,8 +17,7 @@ use objects::*;
 use camera::{PerspectiveCamera};
 use scene::{SceneGraph};
 use math::{Point, Vector, Normal, Direction, RotationAxis};
-use cg_tools::{SamplingTechnique,Transformation};
-use units::Color;
+use cg_tools::{SamplingTechnique,Transformation,Color};
 use acceleration::*;
 
 

@@ -5,8 +5,7 @@ use std::f64;
 
 use super::{Rectangle, Triangle, Mesh, Face, Object, Lambertian};
 use math::{Point, Vector};
-use units::Color;
-use cg_tools::Transformation;
+use cg_tools::{Color, Transformation};
 
 pub fn parse_obj(file_path: &str) -> Result<Mesh,Error> {
     let file = File::open(file_path)?;

@@ -3,7 +3,7 @@ use std::f64::consts::PI;
 use std::fmt::Debug;
 
 use math::Direction;
-use units::Color;
+use cg_tools::Color;
 
 //////////////////
 //Material
