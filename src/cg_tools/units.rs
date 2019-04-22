@@ -1,81 +1,66 @@
 
 use std::ops::{Add, Mul};
 use super::Color;
+use settings::{self, ColorModel};
 
 //////////////////
 //Radiance
 //////////////////
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub struct Radiance{
-    r:f64,
-    g:f64,
-    b:f64
-}
+pub struct Radiance(Color);
 
 impl Radiance {
     pub fn zero() -> Radiance{
-        Radiance{r:0.0,g:0.0,b:0.0}
+        Radiance(Color::black())
     }
-
-    pub fn gray(rad:f64) -> Radiance{
-        Radiance{r:rad,g:rad,b:rad}
-    }
-
-    pub fn new(r:f64, g:f64, b:f64) -> Radiance{
-        Radiance{r,g,b}
-    }
-
-    pub fn r(&self) -> f64 { self.r }
-    pub fn g(&self) -> f64 { self.g }
-    pub fn b(&self) -> f64 { self.b }
+    pub fn gray_scale(rad:f64) -> Radiance { Radiance(Color::gray_scale(rad)) }
 }
 
 impl From<Color> for Radiance {
     fn from(color: Color) -> Self {
-        Radiance{r:color.r(),g:color.g(),b:color.b()}
+        let mut color = color;
+        match settings::get().color_model {
+            ColorModel::RGB => color.convert_to_rgb(),
+            ColorModel::XYZ => color.convert_to_xyz(),
+        };
+        Radiance(color)
+    }
+}
+
+impl From<Radiance> for Color {
+    fn from(rad: Radiance) -> Self {
+        rad.0
     }
 }
 
 impl Add<Radiance> for Radiance{
     type Output = Radiance;
 
-    fn add(self, mut rhs: Radiance) -> Radiance {
-        rhs.r = rhs.r+self.r;
-        rhs.g = rhs.g+self.g;
-        rhs.b = rhs.b+self.b;
-        rhs
+    fn add(self, rhs: Radiance) -> Radiance {
+        Radiance(self.0+rhs.0)
     }
 }
 
 impl Mul<Radiance> for Radiance{
     type Output = Radiance;
 
-    fn mul(mut self, rhs: Radiance) -> Radiance {
-        self.r = self.r*rhs.r;
-        self.g = self.g*rhs.g;
-        self.b = self.b*rhs.b;
-        self
+    fn mul(self, rhs: Radiance) -> Radiance {
+        Radiance(self.0*rhs.0)
     }
 }
 
 impl Mul<f64> for Radiance{
     type Output = Radiance;
 
-    fn mul(mut self, rhs: f64) -> Radiance {
-        self.r = self.r*rhs;
-        self.g = self.g*rhs;
-        self.b = self.b*rhs;
-        self
+    fn mul(self, rhs: f64) -> Radiance {
+        Radiance(self.0*rhs)
     }
 }
 
 impl Mul<Radiance> for f64{
     type Output = Radiance;
 
-    fn mul(self, mut rhs: Radiance) -> Radiance {
-        rhs.r = rhs.r*self;
-        rhs.g = rhs.g*self;
-        rhs.b = rhs.b*self;
-        rhs
+    fn mul(self, rhs: Radiance) -> Radiance {
+        Radiance(self*rhs.0)
     }
 }

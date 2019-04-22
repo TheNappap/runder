@@ -97,7 +97,7 @@ fn normal_color_map(intersect: Option<Intersection>) -> Color{
         None => Color::black(),
         Some(intersect) => {
             let normal = (**intersect.normal()+1.0) / 2.0;
-            Color::new(normal.x, normal.y, normal.z)
+            Color::new_rgb(normal.x, normal.y, normal.z)
         }
     }
 }
@@ -108,7 +108,7 @@ fn distance_color_map(intersect: Option<Intersection>, camera_position: Point, f
         Some(intersect) => {
             //let distance = (intersect.point() - camera_position).length() / factor;
             let distance = intersect.t() / factor;
-            Color::gray(1.0/distance)
+            Color::gray_scale(1.0/distance)
         }
     }
 }
@@ -153,9 +153,10 @@ fn run_program_loop(camera: Arc<PerspectiveCamera>, scene: Arc<SceneGraph>){
                     },
                     ChunkFinished::Chunk(pixels) => {
                         for (pixel,color) in pixels{
-                            let r = (color.r()*255.0) as u8;
-                            let g = (color.g()*255.0) as u8;
-                            let b = (color.b()*255.0) as u8;
+                            let (r,g,b) = color.rgb();
+                            let r = (r*255.0) as u8;
+                            let g = (g*255.0) as u8;
+                            let b = (b*255.0) as u8;
                             canvas.set_draw_color(sdl2::pixels::Color::RGB(r,g,b));
                             canvas.draw_point(sdl2::rect::Point::new(pixel.x,pixel.y)).unwrap();
                         }

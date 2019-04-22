@@ -3,7 +3,14 @@ use cg_tools::SamplingTechnique;
 
 #[derive(Clone)]
 pub enum ColorModel {
-    RGB
+    RGB,
+    XYZ
+}
+
+#[derive(Clone)]
+pub enum AccelerationStructure {
+    BruteForce,
+    BVH
 }
 
 #[derive(Clone)]
@@ -13,7 +20,8 @@ pub struct Settings{
     pub chunk_width: u32,
     pub chunk_height: u32,
     pub gamma: f64,
-    pub color_model: ColorModel,
+    pub color_model: ColorModel,//TODO use
+    pub acceleration_structure: AccelerationStructure,//TODO use
     pub amt_threads: usize,
     pub aa_multi_sample: u32,
     pub light_sampling_technique: SamplingTechnique
@@ -34,6 +42,7 @@ pub const DEFAULT_SETTINGS: Settings = Settings {
     chunk_height: 60,
     gamma: 2.2,
     color_model: ColorModel::RGB,
+    acceleration_structure: AccelerationStructure::BVH,
     amt_threads: 4,
     aa_multi_sample: 1,
     light_sampling_technique: SamplingTechnique::Stratified{multi_sample: 1, seed: 0.0}

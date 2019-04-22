@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::{Error, BufReader, BufRead};
 use std::f64;
 
-use super::{Rectangle, Triangle, Mesh, Face, Object, Lambertian};
+use super::{Rectangle, Triangle, Mesh, Object, Lambertian};
 use math::{Point, Vector};
 use cg_tools::{Color, Transformation};
 
@@ -31,7 +31,7 @@ pub fn parse_obj(file_path: &str) -> Result<Mesh,Error> {
     }).collect();
 
     let transformation = Transformation::new().translate(Vector::new(-2.0,0.0,5.0));
-    let material = Box::new(Lambertian::new(Color::gray(1.0)));
+    let material = Box::new(Lambertian::new(Color::gray_scale(1.0)));
 
     let trans = transformation.clone();
     let mat = material.clone();

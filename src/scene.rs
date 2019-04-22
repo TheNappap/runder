@@ -1,11 +1,9 @@
 
-use std::sync::{Arc};
-
 use settings;
 use math::{Point, Direction, Normal, EPSILON};
 use cg_tools::{Ray,Transformation,Radiance};
 use objects::{Object, Light, Material};
-use acceleration::{AccelerationStructure, BruteForce};
+use acceleration::{AccelerationStructure};
 
 pub struct SceneGraph{
     acc_structure: Box<AccelerationStructure>,

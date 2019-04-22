@@ -29,6 +29,6 @@ impl Lambertian{
 impl Material for Lambertian {
     fn brdf(&self, _: Direction, _: Direction) -> Color {
         let factor = 1.0/(2.0*PI);
-        Color::new(self.color.r()*factor, self.color.g()*factor, self.color.b()*factor)
+        self.color*factor
     }
 }

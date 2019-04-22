@@ -2,7 +2,6 @@
 extern crate itertools;
 use self::itertools::iproduct;
 
-use std::sync::{Arc};
 use std::f64::consts::{PI};
 
 use settings;

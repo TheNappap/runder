@@ -18,10 +18,10 @@ impl BaseVector {
     }
     pub fn from_value(value: f64) -> BaseVector { BaseVector{x: value, y: value, z: value} }
 
+    pub fn as_tuple(&self) -> (f64,f64,f64) { (self.x,self.y,self.z) }
     pub fn sum(&self) -> f64 {
         self.x + self.y + self.z
     }
-
     pub fn dot(&self, other: &BaseVector) -> f64 {
         (*self**other).sum()
     }

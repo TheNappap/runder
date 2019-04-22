@@ -29,7 +29,7 @@ impl Light for PointLight {
 
     fn radiance_from_point(&self, _: Point) -> Radiance {
         let factor = self.power / (4.0*PI);
-        let rad = Radiance::gray(factor);
+        let rad = Radiance::gray_scale(factor);
         rad*Radiance::from(self.color)
     }
 }
@@ -63,7 +63,7 @@ impl Light for SurfaceLight {
 
     fn radiance_from_point(&self, _: Point) -> Radiance {
         let factor = self.power / (2.0*PI);
-        let rad = Radiance::gray(factor);
+        let rad = Radiance::gray_scale(factor);
         rad*Radiance::from(self.color)
     }
 

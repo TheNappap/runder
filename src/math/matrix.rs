@@ -83,6 +83,18 @@ impl Matrix {
     }
 }
 
+impl From<[[f64; 3]; 3]> for Matrix {
+    fn from(base: [[f64; 3]; 3]) -> Self {
+        let mut mat = Matrix::zeros();
+        for i in 0..3 {
+            for j in 0..3 {
+                mat.base[i][j] = base[i][j];
+            }
+        }
+        mat
+    }
+}
+
 impl fmt::Debug for Matrix {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "\n[{}, {}, {}, {}\n {}, {}, {}, {}\n {}, {}, {}, {}\n {}, {}, {}, {}]", self.base[0][0], self.base[0][1], self.base[0][2], self.base[0][3], self.base[1][0], self.base[1][1], self.base[1][2], self.base[1][3], self.base[2][0], self.base[2][1], self.base[2][2], self.base[2][3], self.base[3][0], self.base[3][1], self.base[3][2], self.base[3][3])
