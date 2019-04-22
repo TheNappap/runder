@@ -148,6 +148,7 @@ fn run_program_loop(camera: Arc<PerspectiveCamera>, scene: Arc<SceneGraph>){
                             let elapsed = now.elapsed();
                             println!("Done.");
                             println!("Elapsed time {}.{}s", elapsed.as_secs(), elapsed.subsec_millis());
+                            super::statistics::print_statistics();
                         }
                     },
                     ChunkFinished::Chunk(pixels) => {

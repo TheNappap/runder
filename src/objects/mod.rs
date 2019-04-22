@@ -14,6 +14,7 @@ pub use self::primitives::*;
 
 use cg_tools::{Ray, Transformation, BoundingBox};
 use scene::Intersection;
+use statistics;
 
 pub trait Object : Send + Sync {
     fn as_ref(&self) -> &Object;
@@ -32,7 +33,13 @@ fn intersect_impl<'a,'b>(object: &'a Object, ray: &'b Ray) -> Option<Intersectio
     let transformation = object.transformation();
     let transformed_ray = Ray::new(transformation.inverted()*ray.origin(), transformation.inverted()*ray.direction() );
     match object.intersect_without_transformation(&transformed_ray) {
-        None => None,
-        Some(int) => Some(int.transform(object.transformation(), &ray))
+        None => {
+            statistics::object_intersection(false);
+            None
+        },
+        Some(int) => {
+            statistics::object_intersection(true);
+            Some(int.transform(object.transformation(), &ray))
+        }
     }
 }

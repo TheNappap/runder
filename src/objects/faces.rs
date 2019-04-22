@@ -3,6 +3,7 @@ use super::{Object, Material, Plane};
 use cg_tools::{Transformation, BoundingBox, Ray};
 use math::{Point, Normal, Matrix, EPSILON};
 use scene::Intersection;
+use statistics;
 
 pub trait Face : Object {
     fn double_sided(&self) -> bool;
@@ -28,6 +29,40 @@ impl Triangle{
         let bbox = BoundingBox::new(min,max);
         Triangle{vertices, double_sided, transformation, bbox, material}
     }
+
+    fn moller_trumbore(&self, ray: &Ray) -> Option<Intersection> {
+        let (origin, direction) = (ray.origin(), ray.direction());
+        let edge1 = self.vertices[1] - self.vertices[0];
+        let edge2 = self.vertices[2] - self.vertices[0];
+        let h = (*direction).cross(&edge2);
+        let det = edge1.dot(&h);
+        if (!self.double_sided || det > -EPSILON) && det < EPSILON {
+            return None;
+        }
+        let inv_det = 1.0 / det;
+        let s = origin - self.vertices[0];
+        let u = inv_det * (s.dot(&h));
+        if u < 0.0 || u > 1.0 {
+            return None;
+        }
+        let q = s.cross(&edge1);
+        let v = inv_det * direction.dot(&q);
+        if v < 0.0 || u + v > 1.0 {
+            return None;
+        }
+        let t = inv_det * edge2.dot(&q);
+        if t > 0.0 {
+            let point = origin + t * *direction;
+            let mut normal = Normal::from(edge1.cross(&edge2));
+            if det < 0. {
+                normal = normal.invert();
+            }
+            let int = Intersection::new(t, point, normal, self.material());
+            Some(int)
+        } else {
+            return None;
+        }
+    }
 }
 
 impl Face for Triangle {
@@ -41,40 +76,14 @@ impl Object for Triangle{
         self
     }
 
-    //Möller–Trumbore
     fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
-        let (origin, direction) = (ray.origin(), ray.direction());
-        let edge1 = self.vertices[1] - self.vertices[0];
-        let edge2 = self.vertices[2] - self.vertices[0];
-        let h = (*direction).cross(&edge2);
-        let det = edge1.dot(&h);
-        if (!self.double_sided || det > -EPSILON) && det < EPSILON {
-            return None;
+        let intersect = self.moller_trumbore(ray);
+        if intersect.is_none() {
+            statistics::triangle_intersection(false);
+        } else {
+            statistics::triangle_intersection(true);
         }
-        let inv_det = 1.0/det;
-        let s = origin - self.vertices[0];
-        let u = inv_det * (s.dot(&h));
-        if u < 0.0 || u > 1.0 {
-            return None;
-        }
-        let q = s.cross(&edge1);
-        let v = inv_det * direction.dot(&q);
-        if v < 0.0 || u + v > 1.0 {
-            return None;
-        }
-        let t = inv_det * edge2.dot(&q);
-        if t > 0.0 {
-            let point = origin + t**direction;
-            let mut normal = Normal::from(edge1.cross(&edge2));
-            if det < 0. {
-                normal = normal.invert();
-            }
-            let int = Intersection::new(t, point, normal, self.material());
-            Some(int)
-        }
-            else{
-                return None;
-            }
+        intersect
     }
 
     fn transformation(&self) -> &Transformation { &self.transformation }

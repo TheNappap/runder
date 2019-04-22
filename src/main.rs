@@ -7,6 +7,7 @@ mod camera;
 mod objects;
 mod scene;
 mod settings;
+mod statistics;
 mod thread_pool;
 
 use std::sync::{Arc};
