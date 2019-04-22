@@ -12,7 +12,6 @@ mod thread_pool;
 use std::sync::{Arc};
 use std::f64::consts::{PI,FRAC_PI_2,FRAC_PI_4};
 
-use settings::Settings;
 use objects::*;
 use camera::{PerspectiveCamera};
 use scene::{SceneGraph};
@@ -22,33 +21,31 @@ use acceleration::*;
 
 
 fn main() {
-    let settings = settings::Settings {
-        screen_width: 800,
-        screen_height: 600,
-        chunk_width: 80,
-        chunk_height: 60,
+    let settings = settings::Settings{
         gamma: 2.2,
+        color_model: settings::ColorModel::RGB,
         amt_threads: 6,
         aa_multi_sample: 1,
-        light_sampling_technique: SamplingTechnique::Stratified{multi_sample: 1, seed: 0.0}
+        light_sampling_technique: SamplingTechnique::Stratified{multi_sample: 1, seed: 0.0},
+        ..settings::DEFAULT_SETTINGS
     };
 
-    let settings = Arc::new(settings);
-    let camera = default_camera(settings.clone());
-    let scene = default_scene(settings.clone());
+    settings::set(settings);
+    let camera = default_camera();
+    let scene = default_scene();
 
-    renderer::render(settings, camera, scene);
+    renderer::render(camera, scene);
 }
 
-fn default_camera(settings: Arc<Settings>) -> PerspectiveCamera
+fn default_camera() -> PerspectiveCamera
 {
     let position = Point::new(0.0,0.5,-3.0);
     let direction = Direction::new(0.0,0.0,1.0);
     let up = Direction::up();
-    PerspectiveCamera::new(settings, position,direction,up,60.0)
+    PerspectiveCamera::new(position,direction,up,60.0)
 }
 
-fn default_scene(settings: Arc<Settings>) -> SceneGraph{
+fn default_scene() -> SceneGraph{
     let mut objects: Vec<Box<Object>> = Vec::new();
     objects.push(Box::new(Sphere::new(Transformation::new().translate(Vector::new(0.0,0.0,3.0)), Box::new(Lambertian::new(Color::new(1.0,0.0,0.0))) )));
     objects.push(Box::new(Sphere::new(Transformation::new().scale(2.0,1.0,1.0).rotate(RotationAxis::Zaxis, FRAC_PI_4).translate(Vector::new(2.0,0.0,4.0)),Box::new(Lambertian::new(Color::new(0.0,1.0,1.0))) )));
@@ -70,5 +67,5 @@ fn default_scene(settings: Arc<Settings>) -> SceneGraph{
     lights.push( Box::new(PointLight::new(position,200.0, Color::gray(1.0))) );
     //lights.push( Box::new(PointLight::new(position,2000.0, Color::gray(1.0))) );
 
-    SceneGraph::new(settings, acc_structure, lights)
+    SceneGraph::new(acc_structure, lights)
 }

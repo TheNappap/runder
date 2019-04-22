@@ -1,22 +1,21 @@
 
 use std::sync::{Arc};
-use settings::Settings;
 
+use settings;
 use math::{Point, Direction, Normal, EPSILON};
 use cg_tools::{Ray,Transformation,Radiance};
 use objects::{Object, Light, Material};
 use acceleration::{AccelerationStructure, BruteForce};
 
 pub struct SceneGraph{
-    settings: Arc<Settings>,
     acc_structure: Box<AccelerationStructure>,
     lights : Vec<Box<Light>>
 }
 
 impl SceneGraph {
 
-    pub fn new(settings: Arc<Settings>, acc_structure: Box<AccelerationStructure>, lights : Vec<Box<Light>>) -> SceneGraph{
-        SceneGraph{settings, acc_structure, lights}
+    pub fn new(acc_structure: Box<AccelerationStructure>, lights : Vec<Box<Light>>) -> SceneGraph{
+        SceneGraph{acc_structure, lights}
     }
 
     pub fn intersect(&self, ray: &Ray) -> Option<Intersection> {
@@ -31,7 +30,7 @@ impl SceneGraph {
         let mut radiance = Radiance::zero();
         for light in &self.lights {
             let mut rad = Radiance::zero();
-            let light_points = light.light_points(self.settings.light_sampling_technique);
+            let light_points = light.light_points(settings::get().light_sampling_technique);
             let amount = light_points.len();
             for (light_point, opt_normal) in light_points{
                 let incoming = Direction::from(light_point - intersection.point());
