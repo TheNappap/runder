@@ -6,6 +6,7 @@ use scene::Intersection;
 use statistics;
 
 pub trait Face : Object {
+    fn as_object(self: Box<Self>) -> Box<Object>;
     fn double_sided(&self) -> bool;
 }
 
@@ -66,6 +67,10 @@ impl Triangle{
 }
 
 impl Face for Triangle {
+    fn as_object(self: Box<Self>) -> Box<Object> {
+        self
+    }
+
     fn double_sided(&self) -> bool {
         self.double_sided
     }
@@ -133,6 +138,10 @@ impl Rectangle{
 }
 
 impl Face for Rectangle {
+    fn as_object(self: Box<Self>) -> Box<Object> {
+        self
+    }
+
     fn double_sided(&self) -> bool {
         self.plane.double_sided()
     }

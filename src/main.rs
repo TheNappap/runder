@@ -17,7 +17,6 @@ use camera::{PerspectiveCamera};
 use scene::{SceneGraph};
 use math::{Point, Vector, Normal, Direction, RotationAxis};
 use cg_tools::{SamplingTechnique,Transformation,Color};
-use acceleration::*;
 
 
 fn main() {
@@ -58,7 +57,6 @@ fn default_scene() -> SceneGraph{
     //let mesh = parse_obj("obj\\chair\\chair.obj").expect("Could not read obj");
     let mesh = parse_obj("obj\\diamond.obj").expect("Could not read obj");
     objects.push(Box::new(mesh));
-    let acc_structure = Box::new(BoundingVolumeHierarchy::new(objects));
 
     let mut lights: Vec<Box<Light>> = Vec::new();
     //let position = math::Point::new(0.,8.,0.);
@@ -68,5 +66,5 @@ fn default_scene() -> SceneGraph{
     lights.push( Box::new(PointLight::new(position,600., Color::gray_scale(1.))) );
     //lights.push( Box::new(PointLight::new(position,2000., Color::gray_scale(1.))) );
 
-    SceneGraph::new(acc_structure, lights)
+    SceneGraph::new(objects, lights)
 }

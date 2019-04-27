@@ -3,7 +3,7 @@ use settings;
 use math::{Point, Direction, Normal, EPSILON};
 use cg_tools::{Ray,Transformation,Radiance};
 use objects::{Object, Light, Material};
-use acceleration::{AccelerationStructure};
+use acceleration::{self, AccelerationStructure};
 
 pub struct SceneGraph{
     acc_structure: Box<AccelerationStructure>,
@@ -12,7 +12,8 @@ pub struct SceneGraph{
 
 impl SceneGraph {
 
-    pub fn new(acc_structure: Box<AccelerationStructure>, lights : Vec<Box<Light>>) -> SceneGraph{
+    pub fn new(objects : Vec<Box<Object>>, lights : Vec<Box<Light>>) -> SceneGraph{
+        let acc_structure = acceleration::create_acceleration_structure(objects);
         SceneGraph{acc_structure, lights}
     }
 
