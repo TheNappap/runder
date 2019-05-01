@@ -48,7 +48,7 @@ impl SurfaceLight {
 
 impl Light for SurfaceLight {
     fn light_points(&self, technique: SamplingTechnique) -> Vec<(Point, Option<Normal>)> {
-        let normal: Option<Normal> = Some( &self.surface.transformation().inverted().transpose() * Normal::new(0.0, 1.0, 0.0) );
+        let normal: Option<Normal> = Some( self.surface.transformation().inverted().transpose() * Normal::new(0.0, 1.0, 0.0) );
 
         technique.sample_rect(1.0,1.0).iter().map(|(u, v) |{
             let points = self.surface.points();

@@ -13,8 +13,8 @@ impl Transformation {
         Transformation{matrix: mat.clone(), inverted: mat}
     }
 
-    pub fn matrix(&self) -> &Matrix{ &self.matrix }
-    pub fn inverted(&self) -> &Matrix{ &self.inverted }
+    pub fn matrix(&self) -> Matrix{ self.matrix }
+    pub fn inverted(&self) -> Matrix{ self.inverted }
 
     pub fn translate(mut self, vector: Vector) -> Transformation {
         self.matrix = Matrix::translated(vector) * self.matrix;

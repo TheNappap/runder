@@ -9,7 +9,7 @@ pub struct Matrix {
     base: [[f64; 4]; 4]
 }
 
-#[derive(Copy, Clone,Debug)]
+#[derive(Copy,Clone,Debug)]
 pub enum RotationAxis{
     Xaxis,
     Yaxis,
@@ -115,7 +115,7 @@ impl Mul<Matrix> for Matrix {
     }
 }
 
-impl Mul<Vector> for &Matrix {
+impl Mul<Vector> for Matrix {
     type Output = Vector;
 
     fn mul(self, rhs: Vector) -> Vector {
@@ -126,7 +126,7 @@ impl Mul<Vector> for &Matrix {
     }
 }
 
-impl Mul<Direction> for &Matrix {
+impl Mul<Direction> for Matrix {
     type Output = Direction;
 
     fn mul(self, rhs: Direction) -> Direction {
@@ -134,7 +134,7 @@ impl Mul<Direction> for &Matrix {
     }
 }
 
-impl Mul<Normal> for &Matrix {
+impl Mul<Normal> for Matrix {
     type Output = Normal;
 
     fn mul(self, rhs: Normal) -> Normal {
@@ -142,7 +142,7 @@ impl Mul<Normal> for &Matrix {
     }
 }
 
-impl Mul<Point> for &Matrix {
+impl Mul<Point> for Matrix {
     type Output = Point;
 
     fn mul(self, rhs: Point) -> Point {

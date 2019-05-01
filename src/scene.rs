@@ -76,7 +76,7 @@ impl<'a> Intersection<'a>{
     pub fn transform(mut self, transformation: &Transformation, ray: &Ray) -> Intersection<'a> {
         self.point = transformation.matrix()*self.point;
         self.t = (self.point - ray.origin()).length();
-        self.normal = Normal::from( &transformation.inverted().transpose()**self.normal );
+        self.normal = Normal::from( transformation.inverted().transpose()**self.normal );
         self
     }
 

@@ -154,7 +154,7 @@ impl BoxObject{
         BoxObject{bounds_without_transform, transformation, bbox, material}
     }
 
-    fn bbox(bounds: &BoundingBox, tf_matrix: &Matrix) -> BoundingBox {
+    fn bbox(bounds: &BoundingBox, tf_matrix: Matrix) -> BoundingBox {
         let min = bounds.min();
         let max = bounds.max();
         let (min, max) = iproduct!(&[min.x,max.x], &[min.y,max.y], &[min.z,max.z]).map(|(x,y,z)|{

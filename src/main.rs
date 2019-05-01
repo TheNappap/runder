@@ -22,7 +22,7 @@ use cg_tools::{SamplingTechnique,Transformation,Color};
 fn main() {
     let settings = settings::Settings{
         gamma: 2.2,
-        color_model: settings::ColorModel::XYZ,
+        color_model: settings::ColorModel::XYZ(settings::WhiteReference::D65),
         acceleration_structure: settings::AccelerationStructure::BVH,
         amt_threads: 6,
         aa_multi_sample: 1,

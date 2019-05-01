@@ -129,7 +129,7 @@ impl Rectangle{
     pub fn plane(&self) -> &Plane { &self.plane }
     pub fn points(&self) -> [Point; 4] { self.points }
 
-    fn bbox(points : [Point; 4], tf_matrix: &Matrix) -> BoundingBox {
+    fn bbox(points : [Point; 4], tf_matrix: Matrix) -> BoundingBox {
         let tf_points = [tf_matrix*points[0],tf_matrix*points[1],tf_matrix*points[2],tf_matrix*points[3]];
         let min = tf_points[0].min(tf_points[1]).min(tf_points[2]).min(tf_points[3]);
         let max = tf_points[0].max(tf_points[1]).max(tf_points[2]).max(tf_points[3]);
@@ -156,7 +156,7 @@ impl Object for Rectangle {
         if let Some(intersect) = self.plane.intersect_without_transformation(ray){
             let point = intersect.point();
             let identity = Matrix::identiy();
-            let bbox = Rectangle::bbox(self.points, &identity);
+            let bbox = Rectangle::bbox(self.points, identity);
             let between_x = point.x >= bbox.min().x - EPSILON && point.x <= bbox.max().x + EPSILON;
             let between_y = point.y >= bbox.min().y - EPSILON && point.y <= bbox.max().y + EPSILON;
             let between_z = point.z >= bbox.min().z - EPSILON && point.z <= bbox.max().z + EPSILON;

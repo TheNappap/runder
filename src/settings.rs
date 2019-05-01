@@ -1,13 +1,21 @@
 
 use cg_tools::SamplingTechnique;
 
-#[derive(Clone)]
-pub enum ColorModel {
-    RGB,
-    XYZ
+#[derive(Copy, Clone)]
+pub enum WhiteReference {
+    C,
+    D50,
+    D65,
+    E
 }
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
+pub enum ColorModel {
+    RGB,
+    XYZ(WhiteReference)
+}
+
+#[derive(Copy, Clone)]
 pub enum AccelerationStructure {
     BruteForce,
     BVH
@@ -20,8 +28,8 @@ pub struct Settings{
     pub chunk_width: u32,
     pub chunk_height: u32,
     pub gamma: f64,
-    pub color_model: ColorModel,//TODO use
-    pub acceleration_structure: AccelerationStructure,//TODO use
+    pub color_model: ColorModel,
+    pub acceleration_structure: AccelerationStructure,
     pub amt_threads: usize,
     pub aa_multi_sample: u32,
     pub light_sampling_technique: SamplingTechnique

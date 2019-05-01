@@ -21,7 +21,7 @@ impl From<Color> for Radiance {
         let mut color = color;
         match settings::get().color_model {
             ColorModel::RGB => color.convert_to_rgb(),
-            ColorModel::XYZ => color.convert_to_xyz(),
+            ColorModel::XYZ(_) => color.convert_to_xyz(),
         };
         Radiance(color)
     }
