@@ -105,7 +105,7 @@ impl Mul<Matrix> for Matrix {
     type Output = Matrix;
 
     fn mul(self, rhs: Matrix) -> Matrix {
-        let mut mat = Self::zeros();
+        let mut mat = Self::identiy();
         for i in 0..4 {
             for j in 0..4 {
                 mat.base[i][j] = self.base[i][0]*rhs.base[0][j] + self.base[i][1]*rhs.base[1][j] + self.base[i][2]*rhs.base[2][j] + self.base[i][3]*rhs.base[3][j];

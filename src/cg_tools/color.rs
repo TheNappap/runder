@@ -96,6 +96,14 @@ impl Color {
         let b = b.powf(inv_gamma);
         Color::RGB{r,g,b}
     }
+
+    pub fn clamped_rgb(self) -> Color {
+        let (r,g,b) = self.rgb();
+        let r = r.min(1.);
+        let g = g.min(1.);
+        let b = b.min(1.);
+        Color::RGB{r,g,b}
+    }
 }
 
 impl Add<Color> for Color{

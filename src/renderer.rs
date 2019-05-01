@@ -87,9 +87,8 @@ fn calucate_pixel(pixel: Pixel, camera: &PerspectiveCamera, scene: &SceneGraph) 
 }
 
 fn radiance_color_map(rad: Radiance, gamma: f64) -> Color{
-    let mut color = Color::from(rad);
-    color.gamma_correct(gamma);
-    color
+    let color = Color::from(rad);
+    color.gamma_correct(gamma).clamped_rgb()
 }
 
 fn normal_color_map(intersect: Option<Intersection>) -> Color{

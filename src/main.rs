@@ -39,7 +39,7 @@ fn main() {
 
 fn default_camera() -> PerspectiveCamera
 {
-    let position = Point::new(0.0,0.5,-3.0);
+    let position = Point::new(0.,0.5,-3.0);
     let direction = Direction::new(0.0,0.0,1.);
     let up = Direction::up();
     PerspectiveCamera::new(position,direction,up,60.)
@@ -51,7 +51,7 @@ fn default_scene() -> SceneGraph{
     objects.push(Box::new(Sphere::new(Transformation::new().scale(2.,1.,1.).rotate(RotationAxis::Zaxis, FRAC_PI_4).translate(Vector::new(2.,0.,4.)),Box::new(Lambertian::new(Color::new_rgb(0.,1.,1.))) )));
     objects.push(Box::new(Sphere::new(Transformation::new().translate(Vector::new(-2.,0.,4.)),Box::new(Lambertian::new(Color::new_rgb(0.,1.,0.))) )));
     objects.push(Box::new(Plane::new(Point::new(0.,-1.,0.), Normal::new(0.,1.,0.), false,Transformation::new(), Box::new(Lambertian::new(Color::gray_scale(1.))) )));
-    objects.push(Box::new(Triangle::new([Point::new(-1.,0.,2.),Point::new(-1.,1.,5.),Point::new(3.,0.,2.)], false,Transformation::new(),Box::new(Lambertian::new(Color::gray_scale(1.))) )));
+    //objects.push(Box::new(Triangle::new([Point::new(-1.,0.,2.),Point::new(-1.,1.,5.),Point::new(3.,0.,2.)], false,Transformation::new(),Box::new(Lambertian::new(Color::gray_scale(1.))) )));
     objects.push(Box::new(Rectangle::unit_square(Transformation::new().scale_all(4.).rotate(RotationAxis::Xaxis, -FRAC_PI_2).translate(Vector::new(0.,-1.,6.)), true,Box::new(Lambertian::new(Color::gray_scale(1.))) )));
     objects.push(Box::new(BoxObject::new_from_origin(Point::new(1.,1.,1.), Transformation::new().translate(Vector::new(-4.,2.,4.)), Box::new(Lambertian::new(Color::gray_scale(1.))) )));
     //let mesh = parse_obj("obj\\chair\\chair.obj").expect("Could not read obj");
