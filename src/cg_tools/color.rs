@@ -68,7 +68,7 @@ fn transform_xyz_to_rgb(vec: Vector) -> Vector {
                 WhiteReference::D65 => { (XYZ_TO_SRGB, E_TO_D65) },
                 WhiteReference::E => { (XYZ_TO_CIE_RGB, IDENTITY) },
             };
-            Matrix::from(xyz_to_rgb)*Matrix::from(from_E)*vec
+            Matrix::from(xyz_to_rgb)*vec
         }
     }
 }
@@ -83,7 +83,7 @@ fn transform_rgb_to_xyz(vec: Vector) -> Vector {
                 WhiteReference::D65 => { (SRGB_TO_XYZ, D65_TO_E) },
                 WhiteReference::E => { (CIE_RGB_TO_XYZ, IDENTITY) },
             };
-            Matrix::from(to_E)*Matrix::from(rgb_to_xyz)*vec
+            Matrix::from(rgb_to_xyz)*vec
         }
     }
 }
@@ -146,29 +146,18 @@ impl Color {
 
     pub fn gamma_correct(self, gamma: f64) -> Color {
         let inv_gamma = 1./gamma;
-        match settings::get().color_model {
-            ColorModel::RGB => {
-                let (r,g,b) = self.rgb();
-                let r = r.powf(inv_gamma);
-                let g = g.powf(inv_gamma);
-                let b = b.powf(inv_gamma);
-                Color::RGB{r,g,b}
-            },
-            ColorModel::XYZ(_) => {
-                let (x,y,z) = self.xyz();
-                let x = x.powf(inv_gamma);
-                let y = y.powf(inv_gamma);
-                let z = z.powf(inv_gamma);
-                Color::XYZ{x,y,z}
-            }
-        }
+        let (r,g,b) = self.rgb();
+        let r = r.powf(inv_gamma);
+        let g = g.powf(inv_gamma);
+        let b = b.powf(inv_gamma);
+        Color::RGB{r,g,b}
     }
 
     pub fn clamped_rgb(self) -> Color {
         let (r,g,b) = self.rgb();
-        let r = r.min(1.);
-        let g = g.min(1.);
-        let b = b.min(1.);
+        let r = r.max(0.).min(1.);
+        let g = g.max(0.).min(1.);
+        let b = b.max(0.).min(1.);
         Color::RGB{r,g,b}
     }
 }
