@@ -16,13 +16,13 @@ use objects::*;
 use camera::{PerspectiveCamera};
 use scene::{SceneGraph};
 use math::{Point, Vector, Normal, Direction, RotationAxis};
-use cg_tools::{SamplingTechnique,Transformation,Color};
+use cg_tools::{SamplingTechnique,Transformation,Color,WhiteReference};
 
 
 fn main() {
     let settings = settings::Settings{
         gamma: 2.2,
-        color_model: settings::ColorModel::XYZ(settings::WhiteReference::D65),
+        color_model: settings::ColorModel::XYZ,
         acceleration_structure: settings::AccelerationStructure::BVH,
         amt_threads: 6,
         aa_multi_sample: 1,
@@ -62,8 +62,8 @@ fn default_scene() -> SceneGraph{
     //let position = math::Point::new(0.,8.,0.);
     let position = math::Point::new(-2.,2.,0.);
     let surface = Rectangle::unit_square(Transformation::new().rotate(RotationAxis::Xaxis, PI).translate(Vector::new(0.,6.,0.)), false, Box::new(Lambertian::new(Color::gray_scale(1.))) );
-    lights.push( Box::new(SurfaceLight::new(surface ,1000., Color::gray_scale(1.))) );
-    lights.push( Box::new(PointLight::new(position,600., Color::gray_scale(1.))) );
+    lights.push( Box::new(SurfaceLight::new(surface ,1000., Color::white(WhiteReference::E))) );
+    lights.push( Box::new(PointLight::new(position,600., Color::white(WhiteReference::E))) );
     //lights.push( Box::new(PointLight::new(position,2000., Color::gray_scale(1.))) );
 
     SceneGraph::new(objects, lights)

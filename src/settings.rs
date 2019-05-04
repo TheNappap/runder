@@ -2,17 +2,9 @@
 use cg_tools::SamplingTechnique;
 
 #[derive(Copy, Clone)]
-pub enum WhiteReference {
-    C,
-    D50,
-    D65,
-    E
-}
-
-#[derive(Copy, Clone)]
 pub enum ColorModel {
     RGB,
-    XYZ(WhiteReference)
+    XYZ
 }
 
 #[derive(Copy, Clone)]
