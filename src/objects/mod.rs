@@ -12,34 +12,82 @@ pub use self::mesh::{Mesh};
 pub use self::obj_import::{parse_obj};
 pub use self::primitives::*;
 
-use cg_tools::{Ray, Transformation, BoundingBox};
+use std::sync::Arc;
+use math::Direction;
+use cg_tools::{Ray, Transformation, BoundingBox, Color};
 use scene::Intersection;
 use statistics;
+use settings;
 
+//Object
 pub trait Object : Send + Sync {
-    fn as_ref(&self) -> &Object;
-
-    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
-        intersect_impl(self.as_ref(), &ray)
-    }
-
-    fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection>;
-    fn transformation(&self) -> &Transformation;
-    fn bounding_box(&self) -> &BoundingBox;
+    fn intersect(&self, ray: &Ray) -> Option<Intersection>;
+    fn bounding_box(&self, transformation: &Transformation) -> BoundingBox;
     fn material(&self) -> &Material;
 }
 
-fn intersect_impl<'a,'b>(object: &'a Object, ray: &'b Ray) -> Option<Intersection<'a>> {
-    let transformation = object.transformation();
-    let transformed_ray = Ray::new(transformation.inverted()*ray.origin(), transformation.inverted()*ray.direction() );
-    match object.intersect_without_transformation(&transformed_ray) {
-        None => {
-            statistics::object_intersection(false);
-            None
-        },
-        Some(int) => {
-            statistics::object_intersection(true);
-            Some(int.transform(object.transformation(), &ray))
+//Instance
+pub struct Instance {
+    object: Arc<Object>,
+    transformation: Transformation,
+    bbox: BoundingBox
+}
+
+impl Instance {
+    pub fn new(object: Arc<Object>) -> Instance {
+        let transformation = Transformation::new();
+        let bbox = object.bounding_box(&transformation);
+        Instance{object, transformation, bbox}
+    }
+
+    pub fn transformed(object: Arc<Object>, transformation: Transformation) -> Instance {
+        let bbox = object.bounding_box(&transformation);
+        Instance{object, transformation, bbox}
+    }
+
+    pub fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        let transformed_ray = Ray::new(self.transformation.inverted()*ray.origin(), self.transformation.inverted()*ray.direction() );
+        let intersect = match settings::get().render_mode {
+            settings::RenderMode::BoundingBox => {
+                let int = self.bbox.intersect(&ray);
+                match int {
+                    None => { None},
+                    Some((t, point, normal)) => {Some(Intersection::new(t, point, normal, &BBOX_MATERIAL))},
+                }
+            },
+            _ => self.object.intersect(&transformed_ray)
+        };
+        match intersect {
+            None => {
+                statistics::object_intersection(false);
+                None
+            },
+            Some(int) => {
+                statistics::object_intersection(true);
+                Some(int.transform(&self.transformation, &ray))
+            }
         }
+    }
+
+    pub fn transformation(&self) -> &Transformation{
+        &self.transformation
+    }
+
+    pub fn bounding_box(&self) -> &BoundingBox{
+        &self.bbox
+    }
+
+    pub fn material(&self) -> &Material{
+        self.object.material()
+    }
+}
+
+#[derive(Clone, Debug)]
+struct BoundingBoxMaterial;
+static BBOX_MATERIAL: BoundingBoxMaterial = BoundingBoxMaterial;
+
+impl Material for BoundingBoxMaterial {
+    fn brdf(&self, _: Direction, _: Direction) -> Color {
+        Color::RGB {r:1.,g:1.,b:1.}
     }
 }

@@ -12,14 +12,13 @@ use std::sync::mpsc::{Sender};
 use settings;
 use thread_pool::{ThreadPool};
 use camera::{Pixel, PerspectiveCamera};
-use scene::{SceneGraph, Intersection};
+use scene::{Scene, Intersection};
 use math::{Point};
 use cg_tools::{Color, Radiance};
 
-pub fn render(camera: PerspectiveCamera, scene: SceneGraph){
-    let camera = Arc::new(camera);
+pub fn render(scene: Scene){
     let scene = Arc::new(scene);
-    run_program_loop(camera, scene);
+    run_program_loop(scene);
 }
 
 #[derive(Debug)]
@@ -28,7 +27,7 @@ enum ChunkFinished {
     Done
 }
 
-fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool, camera: &Arc<PerspectiveCamera>, scene_graph: &Arc<SceneGraph>, sender : &Sender<ChunkFinished>){
+fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool, scene_graph: &Arc<Scene>, sender : &Sender<ChunkFinished>){
     let settings = settings::get();
     let width = settings.screen_width;
     let height = settings.screen_height;
@@ -38,7 +37,6 @@ fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool,
     for (h,w) in chunks {
         let sender_clone = Sender::clone(&sender);
         let scene = scene_graph.clone();
-        let camera = camera.clone();
 
         thread_pool.execute( move || {
             let mut pixels = Vec::new();
@@ -50,7 +48,7 @@ fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool,
                 let till_w = if width-w < chunk_width {w+(width-w)} else {w+chunk_width};
 
                 for x in w..till_w{
-                    pixels.push(calucate_pixel(Pixel{x: x as i32,y: y as i32}, &camera, &scene));
+                    pixels.push(calucate_pixel(Pixel{x: x as i32,y: y as i32}, &scene));
                 }
             }
             sender_clone.send(ChunkFinished::Chunk(pixels)).unwrap();
@@ -65,10 +63,18 @@ fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool,
     }
 }
 
-fn calucate_pixel(pixel: Pixel, camera: &PerspectiveCamera, scene: &SceneGraph) -> (Pixel, Color) {
+#[derive(Copy, Clone, Debug)]
+pub enum RenderMode {
+    Default,
+    Normals,
+    Distance(f64),
+    BoundingBox
+}
+
+fn calucate_pixel(pixel: Pixel, scene: &Scene) -> (Pixel, Color) {
     let settings = settings::get();
     let mut intersect = None;
-    let rad = camera.rays_for_pixel(&pixel).iter().map(|ray|{
+    let rad = scene.camera().rays_for_pixel(&pixel).iter().map(|ray|{
         (scene.intersect(ray), ray.direction())
     }).map(|(int,dir)|{
         intersect = int.clone();
@@ -80,9 +86,12 @@ fn calucate_pixel(pixel: Pixel, camera: &PerspectiveCamera, scene: &SceneGraph) 
         acc + rad
     }) * (1.0/(settings.aa_multi_sample.pow(2)) as f64);
 
-    let color = radiance_color_map(rad, settings.gamma);
-    //let color = normal_color_map(intersect);
-    //let color = distance_color_map(intersect, camera.position(), 2.);
+    let color = match settings.render_mode {
+        RenderMode::Default => radiance_color_map(rad, settings.gamma),
+        RenderMode::Normals => normal_color_map(intersect),
+        RenderMode::Distance(factor) => distance_color_map(intersect, scene.camera().position(), factor),
+        RenderMode::BoundingBox => normal_color_map(intersect),
+    };
     (pixel,color)
 }
 
@@ -112,7 +121,7 @@ fn distance_color_map(intersect: Option<Intersection>, camera_position: Point, f
     }
 }
 
-fn run_program_loop(camera: Arc<PerspectiveCamera>, scene: Arc<SceneGraph>){
+fn run_program_loop(scene: Arc<Scene>){
     let settings = settings::get();
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -132,7 +141,7 @@ fn run_program_loop(camera: Arc<PerspectiveCamera>, scene: Arc<SceneGraph>){
     let (sender, receiver) = mpsc::channel();
     let mut thread_pool = ThreadPool::new(settings.amt_threads);
     let mut chunks = iproduct!(0..(settings.screen_height/settings.chunk_height)+1, 0..(settings.screen_width/settings.chunk_width)+1).peekable();
-    init_threads(&mut chunks, &mut thread_pool, &camera, &scene, &sender);
+    init_threads(&mut chunks, &mut thread_pool,&scene, &sender);
     thread_pool.finish_jobs();
 
     let mut quit = false;

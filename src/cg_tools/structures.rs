@@ -1,4 +1,8 @@
 
+extern crate itertools;
+use self::itertools::iproduct;
+
+use::cg_tools::Transformation;
 use math::{Point, Direction, Normal, EPSILON};
 
 //////////////////
@@ -55,6 +59,17 @@ impl BoundingBox {
             && self.min.z <= point.z && self.max.z >= point.z
     }
 
+    pub fn transformed(&self, transformation: &Transformation) -> BoundingBox {
+        let transform = transformation.matrix();
+        let (min, max) = iproduct!(&[self.min.x,self.max.x], &[self.min.y,self.max.y], &[self.min.z,self.max.z]).map(|(x,y,z)|{
+            Point::new(*x,*y,*z)
+        }).fold((Point::max_point(), Point::min_point()), |(acc_min, acc_max), point|{
+            let tf_point = transform*point;
+            (acc_min.min(tf_point), acc_max.max(tf_point))
+        });
+        BoundingBox::new(min, max)
+    }
+
     pub fn intersect(&self, ray: &Ray) -> Option<(f64, Point, Normal)> {
         let (origin, direction) = (ray.origin(), ray.direction());
         if self.contains(&origin) {
@@ -87,7 +102,8 @@ impl BoundingBox {
         //if tzmax < tmax { tmax = tzmax; }
 
         let t = tmin;
-        if t <= 0.0 { return None }let point = origin + t**direction;
+        if t <= 0.0 { return None }
+        let point = origin + t**direction;
         let normal = match (t, point) {
             (t,p) if t == txmin && p.x.abs() < EPSILON => Normal::new(-1.0, 0.0, 0.0),
             (t,_) if t == txmin => Normal::new(1.0,0.0,0.0),

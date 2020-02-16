@@ -4,8 +4,8 @@ use std::io::{Error, BufReader, BufRead};
 use std::f64;
 
 use super::{Rectangle, Triangle, Mesh, Face, Lambertian};
-use math::{Point, Vector};
-use cg_tools::{Color, Transformation};
+use math::{Point};
+use cg_tools::{Color};
 
 pub fn parse_obj(file_path: &str) -> Result<Mesh,Error> {
     let file = File::open(file_path)?;
@@ -30,18 +30,15 @@ pub fn parse_obj(file_path: &str) -> Result<Mesh,Error> {
         Point::new(v[0], v[1], v[2])
     }).collect();
 
-    let transformation = Transformation::new().translate(Vector::new(-2.0,0.0,5.0));
     let material = Box::new(Lambertian::new(Color::gray_scale(1.0)));
-
-    let trans = transformation.clone();
     let mat = material.clone();
     let faces : Vec<Box<Face>> = faces.iter().filter_map(move |vec|{
         let v: Vec<Point> = vec.iter().map(|s| s.split('/').next().unwrap() )
             .map(|s| s.parse().expect("Unable to convert String to usize") )
             .map(|index: usize| vertices.get(index-1).unwrap() ).cloned().collect();
         match v.len() {
-            3 => Some(Box::new(Triangle::new([v[0],v[1],v[2]], false,trans.clone(), mat.clone())) as Box<Face>),
-            4 => Some(Box::new(Rectangle::new([v[0],v[1],v[2],v[3]], false,trans.clone(), mat.clone())) as Box<Face>),
+            3 => Some(Box::new(Triangle::new([v[0],v[1],v[2]], false,mat.clone())) as Box<Face>),
+            4 => Some(Box::new(Rectangle::new([v[0],v[1],v[2],v[3]], false,mat.clone())) as Box<Face>),
             x if x < 3 => None,
             x => {
                 println!("Faces with {} vertices are not supported.", x);
@@ -52,6 +49,6 @@ pub fn parse_obj(file_path: &str) -> Result<Mesh,Error> {
 
     println!("Imported mesh: {}", file_path);
     println!("Amount of faces: {}", faces.len());
-    let mesh = Mesh::new(faces, transformation, material);
+    let mesh = Mesh::new(faces, material);
     Ok( mesh )
 }

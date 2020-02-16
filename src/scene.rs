@@ -2,19 +2,24 @@
 use settings;
 use math::{Point, Direction, Normal, EPSILON};
 use cg_tools::{Ray,Transformation,Radiance};
-use objects::{Object, Light, Material};
+use objects::{Instance, Light, Material};
 use acceleration::{self, AccelerationStructure};
+use camera::PerspectiveCamera;
 
-pub struct SceneGraph{
+pub struct Scene {
     acc_structure: Box<AccelerationStructure>,
-    lights : Vec<Box<Light>>
+    lights : Vec<Box<Light>>,
+    camera: PerspectiveCamera
 }
 
-impl SceneGraph {
+impl Scene {
+    pub fn new(instances : Vec<Instance>, lights : Vec<Box<Light>>, camera: PerspectiveCamera) -> Scene {
+        let acc_structure = acceleration::create_acceleration_structure(instances);
+        Scene {acc_structure, lights, camera}
+    }
 
-    pub fn new(objects : Vec<Box<Object>>, lights : Vec<Box<Light>>) -> SceneGraph{
-        let acc_structure = acceleration::create_acceleration_structure(objects);
-        SceneGraph{acc_structure, lights}
+    pub fn camera(&self) -> &PerspectiveCamera {
+        &self.camera
     }
 
     pub fn intersect(&self, ray: &Ray) -> Option<Intersection> {
@@ -44,7 +49,7 @@ impl SceneGraph {
 
                 let factor = (cos_point*cos_light)/(r*r);
                 let rad_from_light = light.radiance_from_point(light_point);
-                let brdf = intersection.material.brdf(incoming, outgoing);
+                let brdf = intersection.material().brdf(incoming, outgoing);
                 rad = rad + factor*(rad_from_light*Radiance::from(brdf));
             }
 

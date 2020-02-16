@@ -77,13 +77,17 @@ impl ThreadPool {
     pub fn execute<F>(&self, job: F) where F : FnOnce() + Send + 'static {
         let job = Box::new(job);
 
-        self.sender.send(ThreadMessage::NewJob(job)).unwrap();
+        if let Err(e) = self.sender.send(ThreadMessage::NewJob(job)) {
+            println!("{:?}", e);
+        }
     }
 
     pub fn finish<F>(&self, job: F) where F : FnOnce() + Send + 'static {
         let job = Box::new(job);
 
-        self.sender.send(ThreadMessage::Finish(job)).unwrap();
+        if let Err(e) = self.sender.send(ThreadMessage::Finish(job)) {
+            println!("{:?}", e);
+        }
     }
 
     pub fn finish_jobs(self) {
@@ -96,12 +100,16 @@ impl ThreadPool {
 impl Drop for ThreadPool {
     fn drop(&mut self) {
         for _ in &self.threads {
-            self.sender.send(ThreadMessage::Terminate).unwrap();
+            if let Err(e) = self.sender.send(ThreadMessage::Terminate) {
+                println!("{:?}", e);
+            }
         }
 
         for thread in &mut self.threads {
             if let Some(thread) = thread.thread_join.take() {
-                thread.join().unwrap();
+                if let Err(e) = thread.join() {
+                    println!("{:?}", e);
+                }
             }
         }
     }

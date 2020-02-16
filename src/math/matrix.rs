@@ -65,6 +65,9 @@ impl Matrix {
     pub fn get(&self, n: usize, m: usize) -> f64 {
         self.base[n][m]
     }
+    pub fn rows(&self) -> [&[f64]; 3] {
+        [&self.base[0][0..3],&self.base[1][0..3],&self.base[2][0..3]]
+    }
 
     pub fn transpose(mut self) -> Matrix {
         let swap = |base: &mut [[f64; 4]; 4], i: usize, j: usize| {

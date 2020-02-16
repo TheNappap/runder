@@ -1,7 +1,7 @@
 
 use std::ops::{Add, Mul};
-use super::Color;
-use settings::{self, ColorModel};
+use super::{Color,ColorModel};
+use settings;
 
 //////////////////
 //Radiance

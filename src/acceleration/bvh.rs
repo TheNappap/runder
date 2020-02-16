@@ -1,7 +1,7 @@
 
-use objects::Object;
+use objects::Instance;
 use acceleration::AccelerationStructure;
-use cg_tools::{Ray, BoundingBox};
+use cg_tools::{Ray, BoundingBox, Transformation};
 use math::{Point, Direction};
 use scene::Intersection;
 
@@ -13,42 +13,57 @@ enum Axis {
 
 enum BVHNode {
     Composite(Box<BoundingVolumeHierarchy>,Box<BoundingVolumeHierarchy>),
-    Leaf(Vec<Box<Object>>)
+    Leaf(Vec<Instance>)
+}
+
+impl BVHNode {
+    fn leaf(instances: Vec<Instance>) -> BVHNode{
+        BVHNode::Leaf(instances)
+    }
+
+    fn composite(instances1: Vec<Instance>, instances2: Vec<Instance>, split_axis: Axis) -> BVHNode{
+        let bvh1 = BoundingVolumeHierarchy::new(instances1);
+        let bvh2 = BoundingVolumeHierarchy::new(instances2);
+        BVHNode::Composite(Box::new(bvh1), Box::new(bvh2))
+    }
+
+    fn bounding_box(&self, transformation: &Transformation) -> BoundingBox {
+        match self {
+            BVHNode::Leaf(instances) => {
+                instances.iter().map(|o|{
+                    o.bounding_box().transformed(transformation)
+                }).fold(BoundingBox::new(Point::max_point(), Point::min_point()), |acc, bbox|{
+                    acc.union(&bbox)
+                })
+            },
+            BVHNode::Composite(bvh1, bvh2) => {
+                let bbox1 = bvh1.bounding_box(transformation);
+                let bbox2 = bvh2.bounding_box(transformation);
+                bbox1.union(&bbox2)
+            }
+        }
+    }
 }
 
 pub struct BoundingVolumeHierarchy {
     bbox: BoundingBox,
-    node: BVHNode
+    root: BVHNode
 }
 
 impl BoundingVolumeHierarchy {
 
-    pub fn new(objects: Vec<Box<Object>>) -> BoundingVolumeHierarchy {
-        BoundingVolumeHierarchy::split_objects(objects, &Axis::XAxis)
+    pub fn new(instances: Vec<Instance>) -> BoundingVolumeHierarchy {
+        let root = BoundingVolumeHierarchy::split_instances(instances, &Axis::XAxis);
+        let bbox = root.bounding_box(&Transformation::new());
+        BoundingVolumeHierarchy{bbox, root}
     }
 
-    fn leaf(objects: Vec<Box<Object>>) -> BoundingVolumeHierarchy{
-        let bbox = objects.iter().map(|o|{
-            o.bounding_box()
-        }).fold(BoundingBox::new(Point::max_point(), Point::min_point()), |acc, bbox|{
-            acc.union(&bbox)
-        });
-        BoundingVolumeHierarchy{bbox, node: BVHNode::Leaf(objects)}
-    }
-
-    fn composite(objects1: Vec<Box<Object>>, objects2: Vec<Box<Object>>, split_axis: Axis) -> BoundingVolumeHierarchy{
-        let bvh1 = BoundingVolumeHierarchy::split_objects(objects1, &split_axis);
-        let bvh2 = BoundingVolumeHierarchy::split_objects(objects2, &split_axis);
-        let bbox = bvh1.bbox.union(&bvh2.bbox);
-        BoundingVolumeHierarchy{bbox, node: BVHNode::Composite(Box::new(bvh1), Box::new(bvh2))}
-    }
-
-    fn split_objects(mut objects: Vec<Box<Object>>, split_axis: &Axis) -> BoundingVolumeHierarchy {
-        if objects.len() < 4 {
-            return BoundingVolumeHierarchy::leaf(objects);
+    fn split_instances(mut instances: Vec<Instance>, split_axis: &Axis) -> BVHNode {
+        if instances.len() < 4 {
+            return BVHNode::leaf(instances);
         }
 
-        objects.sort_by(|a,b|{
+        instances.sort_by(|a,b|{
             let bbox1 = a.bounding_box();
             let bbox2 = b.bounding_box();
             if let Some(ord) = bbox1.min().x.partial_cmp(&bbox2.min().x) {
@@ -57,8 +72,8 @@ impl BoundingVolumeHierarchy {
             else { std::cmp::Ordering::Equal }
         });
 
-        let chunk_size = (objects.len() + 1) / 2; //round up
-        let (objects1, objects2): (Vec<Box<Object>>,Vec<Box<Object>>) = objects.drain(..).enumerate()
+        let chunk_size = (instances.len() + 1) / 2; //round up
+        let (instances1, instances2): (Vec<Instance>,Vec<Instance>) = instances.drain(..).enumerate()
             .fold( (Vec::new(),Vec::new()),|(mut vec1,mut vec2), (i,o)|{
             if i < chunk_size { vec1.push(o); }
             else { vec2.push(o); }
@@ -70,53 +85,61 @@ impl BoundingVolumeHierarchy {
             Axis::YAxis => Axis::ZAxis,
             Axis::ZAxis => Axis::XAxis,
         };
-        BoundingVolumeHierarchy::composite(objects1, objects2, next_split_axis)
+        BVHNode::composite(instances1, instances2, next_split_axis)
     }
 
-    fn intersect_node(&self, ray: &Ray) -> Option<Intersection> {
-        match &self.node {
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        if self.bbox.intersect(&ray).is_none() {
+            return None;
+        }
+
+        match &self.root {
             BVHNode::Composite(bvh1, bvh2) =>{
                 let int1 = bvh1.bbox.intersect(&ray);
                 let int2 = bvh2.bbox.intersect(&ray);
                 match (int1,int2) {
                     (None,None) => None,
-                    (Some(_),None) => bvh1.intersect_node(ray),
-                    (None,Some(_)) => bvh2.intersect_node(ray),
+                    (Some(_),None) => bvh1.intersect(ray),
+                    (None,Some(_)) => bvh2.intersect(ray),
                     (Some((t1,_,_)),Some((t2,_,_))) => {
                         let (first,second) = if t1 < t2 { (bvh1, bvh2) } else { (bvh2,bvh1) };
-                        let int1 = bvh1.intersect_node(ray);
+                        let int1 = bvh1.intersect(ray);
                         if int1.is_some() && int1.unwrap().t() < t2 { return int1; }
-                        let int2 = bvh2.intersect_node(ray);
+                        let int2 = bvh2.intersect(ray);
                         Intersection::closest_intersection(int1,int2)
                     }
                 }
             },
-            BVHNode::Leaf(objects) => {
-                objects.iter()
+            BVHNode::Leaf(instances) => {
+                instances.iter()
                     .map(|o| o.intersect( ray ) )
                     .fold(None, Intersection::closest_intersection)
             }
         }
     }
 
-    fn visible_node(&self, ray: &Ray, distance: f64) -> bool {
-        match &self.node {
+    fn visible(&self, ray: &Ray, distance: f64) -> bool {
+        if self.bbox.intersect(&ray).is_none() {
+            return false;
+        }
+
+        match &self.root {
             BVHNode::Composite(bvh1, bvh2) =>{
                 let int1 = bvh1.bbox.intersect(&ray);
                 let int2 = bvh2.bbox.intersect(&ray);
                 match (int1,int2) {
                     (None,None) => true,
-                    (Some(_),None) => bvh1.visible_node(ray, distance),
-                    (None,Some(_)) => bvh2.visible_node(ray, distance),
+                    (Some(_),None) => bvh1.visible(ray, distance),
+                    (None,Some(_)) => bvh2.visible(ray, distance),
                     (Some((t1,_,_)),Some((t2,_,_))) => {
                         let (first,second) = if t1 < t2 { (bvh1, bvh2) } else { (bvh2,bvh1) };
-                        if !first.visible_node(ray, distance) { return false; }
-                        second.visible_node(ray, distance)
+                        if !first.visible(ray, distance) { return false; }
+                        second.visible(ray, distance)
                     }
                 }
             },
-            BVHNode::Leaf(objects) => {
-                for object in objects {
+            BVHNode::Leaf(instances) => {
+                for object in instances {
                     if let Some(intersect) = object.intersect( &ray ) {
                         let dist = (intersect.point() - ray.origin()).length();
                         if dist < distance {
@@ -132,11 +155,12 @@ impl BoundingVolumeHierarchy {
 
 impl AccelerationStructure for BoundingVolumeHierarchy {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        //println!("{:?}",self.bbox);
         if self.bbox.intersect(&ray).is_none() {
             return None;
         }
 
-        self.intersect_node(ray)
+        self.intersect(ray)
     }
 
     fn visible(&self, from: Point, to: Point) -> bool {
@@ -147,6 +171,10 @@ impl AccelerationStructure for BoundingVolumeHierarchy {
             return true;
         }
 
-        self.visible_node(&ray, distance)
+        self.visible(&ray, distance)
+    }
+
+    fn bounding_box(&self, transformation: &Transformation) -> BoundingBox {
+        self.root.bounding_box(transformation)
     }
 }

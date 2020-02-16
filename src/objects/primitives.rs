@@ -1,8 +1,5 @@
-extern crate itertools;
 
-use self::itertools::iproduct;
-
-use math::{Point, Vector, Normal, Matrix, EPSILON};
+use math::{Point, Vector, Normal, EPSILON};
 use cg_tools::{Ray,Transformation,BoundingBox};
 use scene::Intersection;
 use objects::{Object,Material};
@@ -12,36 +9,17 @@ use objects::{Object,Material};
 //////////////////
 #[derive(Debug)]
 pub struct Sphere {
-    transformation : Transformation,
-    bbox: BoundingBox,
     material : Box<Material>
 }
 
 impl Sphere {
-    pub fn new(transformation: Transformation, material: Box<Material>) -> Self{
-        let bbox = Sphere::bbox(&transformation);
-        Sphere { transformation, bbox, material }
-    }
-
-    fn bbox(transformation: &Transformation) -> BoundingBox {
-        //https://members.loria.fr/SHornus/ellipsoid-bbox.html
-        //https://math.stackexchange.com/questions/1254181/bounding-box-of-ellipsoid
-        let center = transformation.matrix()*Point::origin();
-        let x = transformation.inverted().get(0,0).sqrt();
-        let y = transformation.inverted().get(1,1).sqrt();
-        let z = transformation.inverted().get(2,2).sqrt();
-        let max = center + Vector::new(x,y,z);
-        let min = center + Vector::new(x,y,z).invert();
-        BoundingBox::new(min,max)
+    pub fn new(material: Box<Material>) -> Self{
+        Sphere { material }
     }
 }
 
 impl Object for Sphere {
-    fn as_ref(&self) -> &Object {
-        self
-    }
-
-    fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         let (origin, direction) = (ray.origin(), ray.direction());
 
         let a = direction.dot(&direction);
@@ -75,9 +53,18 @@ impl Object for Sphere {
             else { None }
     }
 
-    fn transformation(&self) -> &Transformation { &self.transformation }
-
-    fn bounding_box(&self) -> &BoundingBox { &self.bbox }
+    fn bounding_box(&self, transformation: &Transformation) -> BoundingBox {
+        //https://members.loria.fr/SHornus/ellipsoid-bbox.html
+        let matrix = transformation.matrix();
+        let center = matrix*Point::origin();
+        let rows = matrix.rows();
+        let norms : Vec<_> = rows.iter().map(|x|{
+            (x[0]*x[0]+x[1]*x[1]+x[2]*x[2]).sqrt()
+        }).collect();
+        let max = center + Vector::new(norms[0],norms[1],norms[2]);
+        let min = center + Vector::new(norms[0],norms[1],norms[2]).invert();
+        BoundingBox::new(min,max)
+    }
 
     fn material(&self) -> &Material {
         self.material.as_ref()
@@ -92,26 +79,19 @@ pub struct Plane {
     point : Point,
     normal: Normal,
     double_sided: bool,
-    transformation: Transformation,
-    bbox: BoundingBox,
     material : Box<Material>
 }
 
 impl Plane{
-    pub fn new(point : Point, normal: Normal, double_sided: bool, transformation: Transformation, material: Box<Material>) -> Plane{
-        let bbox = BoundingBox::new(Point::min_point(),Point::max_point());
-        Plane{point, normal, double_sided, transformation, bbox, material}
+    pub fn new(point : Point, normal: Normal, double_sided: bool, material: Box<Material>) -> Plane{
+        Plane{point, normal, double_sided, material}
     }
 
     pub fn double_sided(&self) -> bool { self.double_sided }
 }
 
 impl Object for Plane {
-    fn as_ref(&self) -> &Object {
-        self
-    }
-
-    fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         let (origin, direction) = (ray.origin(), ray.direction());
 
         let nom = direction.invert().dot(&self.normal);
@@ -129,9 +109,10 @@ impl Object for Plane {
         }
     }
 
-    fn transformation(&self) -> &Transformation { &self.transformation }
-
-    fn bounding_box(&self) -> &BoundingBox { &self.bbox }
+    fn bounding_box(&self, transformation: &Transformation) -> BoundingBox {
+        let transform = transformation.matrix();
+        BoundingBox::new(transform*Point::min_point(),transform*Point::max_point())
+    }
 
     fn material(&self) -> &Material { self.material.as_ref() }
 }
@@ -141,47 +122,28 @@ impl Object for Plane {
 //////////////////
 #[derive(Debug)]
 pub struct BoxObject {
-    bounds_without_transform: BoundingBox,
-    transformation: Transformation,
-    bbox:  BoundingBox,
+    bounds: BoundingBox,
     material : Box<Material>
 }
 
 impl BoxObject{
-    pub fn new_from_origin(corner_point: Point, transformation: Transformation, material: Box<Material>) -> BoxObject{
-        let bounds_without_transform = BoundingBox::new_from_origin(corner_point);
-        let bbox = BoxObject::bbox(&bounds_without_transform, transformation.matrix());
-        BoxObject{bounds_without_transform, transformation, bbox, material}
-    }
-
-    fn bbox(bounds: &BoundingBox, tf_matrix: Matrix) -> BoundingBox {
-        let min = bounds.min();
-        let max = bounds.max();
-        let (min, max) = iproduct!(&[min.x,max.x], &[min.y,max.y], &[min.z,max.z]).map(|(x,y,z)|{
-            Point::new(*x,*y,*z)
-        }).fold((Point::max_point(), Point::min_point()), |(acc_min, acc_max), point|{
-            let tf_point = tf_matrix*point;
-            (acc_min.min(tf_point), acc_max.max(tf_point))
-        });
-        BoundingBox::new(min, max)
+    pub fn new_from_origin(corner_point: Point, material: Box<Material>) -> BoxObject{
+        let bounds = BoundingBox::new_from_origin(corner_point);
+        BoxObject{bounds, material}
     }
 }
 
 impl Object for BoxObject {
-    fn as_ref(&self) -> &Object {
-        self
-    }
-
-    fn intersect_without_transformation(&self, ray: &Ray) -> Option<Intersection> {
-        match self.bounds_without_transform.intersect(ray) {
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        match self.bounds.intersect(ray) {
             None => return None,
             Some(int) => Some(Intersection::new(int.0, int.1, int.2, self.material()))
         }
     }
 
-    fn transformation(&self) -> &Transformation { &self.transformation }
-
-    fn bounding_box(&self) -> &BoundingBox { &self.bbox }
+    fn bounding_box(&self, transformation: &Transformation) -> BoundingBox {
+        self.bounds.transformed(transformation)
+    }
 
     fn material(&self) -> &Material { self.material.as_ref() }
 }

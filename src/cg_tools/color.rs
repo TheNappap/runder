@@ -1,7 +1,7 @@
 
 use std::ops::{Add, Mul};
 use math::{Matrix,Vector};
-use settings::{self,ColorModel};
+use settings;
 
 #[derive(Copy, Clone)]
 pub enum WhiteReference {
@@ -27,6 +27,13 @@ const XYZ_TO_CIE_RGB: [[f64; 3]; 3] = [ [2.3706743, -0.9000405, -0.4706338],
 //////////////////
 //Color
 //////////////////
+
+#[derive(Copy, Clone, Debug)]
+pub enum ColorModel {
+    RGB,
+    XYZ
+}
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Color {
     RGB{r:f64,g:f64,b:f64},
