@@ -1,8 +1,8 @@
 [package]
-name = "androidtest"
+name = "rust_renderer"
 version = "0.1.0"
 build = "build.rs"
-authors = ["TheNappap <mathijs.delabie@student.kuleuven.be>"]
+authors = ["TheNappap <napoleonpapiertjes@gmail.com>"]
 
 [dependencies.sdl2]
 version = "*"
