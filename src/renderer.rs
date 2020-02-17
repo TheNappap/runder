@@ -148,7 +148,7 @@ fn run_program_loop(scene: Arc<Scene>){
     let mut finished_jobs = 0;
     while !quit {
         if finished_jobs < settings.amt_threads {
-            while let Ok(chunk_finished) = receiver.try_recv(){
+            while let Ok(chunk_finished) = receiver.recv() {
                 match chunk_finished {
                     ChunkFinished::Done => {
                         finished_jobs += 1;
@@ -157,6 +157,7 @@ fn run_program_loop(scene: Arc<Scene>){
                             println!("Done.");
                             println!("Elapsed time {}.{}s", elapsed.as_secs(), elapsed.subsec_millis());
                             super::statistics::print_statistics();
+                            break;
                         }
                     },
                     ChunkFinished::Chunk(pixels) => {
