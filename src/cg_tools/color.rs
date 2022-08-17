@@ -1,5 +1,5 @@
 
-use std::ops::{Add, Mul};
+use std::ops::{Add, Div, Mul};
 use crate::math::{Matrix,Vector};
 use crate::settings;
 
@@ -188,6 +188,40 @@ impl Mul<Color> for f64{
             ColorModel::XYZ => {
                 let xyz = rhs.xyz();
                 Color::XYZ {x:xyz.0*self,y:xyz.1*self,z:xyz.2*self}
+            },
+        }
+    }
+}
+
+impl Div<f64> for Color{
+    type Output = Color;
+
+    fn div(self, rhs: f64) -> Color {
+        match settings::get().color_model {
+            ColorModel::RGB => {
+                let rgb = self.rgb();
+                Color::RGB {r:rgb.0/rhs,g:rgb.1/rhs,b:rgb.2/rhs}
+            },
+            ColorModel::XYZ => {
+                let xyz = self.xyz();
+                Color::XYZ {x:xyz.0/rhs,y:xyz.1/rhs,z:xyz.2/rhs}
+            },
+        }
+    }
+}
+
+impl Div<Color> for f64{
+    type Output = Color;
+
+    fn div(self, rhs: Color) -> Color {
+        match settings::get().color_model {
+            ColorModel::RGB => {
+                let rgb = rhs.rgb();
+                Color::RGB {r:rgb.0/self,g:rgb.1/self,b:rgb.2/self}
+            },
+            ColorModel::XYZ => {
+                let xyz = rhs.xyz();
+                Color::XYZ {x:xyz.0/self,y:xyz.1/self,z:xyz.2/self}
             },
         }
     }

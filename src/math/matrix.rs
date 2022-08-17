@@ -1,5 +1,5 @@
 
-use std::ops::{Mul};
+use std::ops::{Mul,Add};
 use std::fmt;
 
 use super::{Point, Vector, Direction, Normal};
@@ -112,6 +112,34 @@ impl Mul<Matrix> for Matrix {
         for i in 0..4 {
             for j in 0..4 {
                 mat.base[i][j] = self.base[i][0]*rhs.base[0][j] + self.base[i][1]*rhs.base[1][j] + self.base[i][2]*rhs.base[2][j] + self.base[i][3]*rhs.base[3][j];
+            }
+        }
+        mat
+    }
+}
+
+impl Add<Matrix> for Matrix {
+    type Output = Matrix;
+
+    fn add(self, rhs: Matrix) -> Matrix {
+        let mut mat = Self::zeros();
+        for i in 0..4 {
+            for j in 0..4 {
+                mat.base[i][j] = self.base[i][j] + rhs.base[i][j];
+            }
+        }
+        mat
+    }
+}
+
+impl Mul<f64> for Matrix {
+    type Output = Matrix;
+
+    fn mul(self, rhs: f64) -> Matrix {
+        let mut mat = Self::zeros();
+        for i in 0..4 {
+            for j in 0..4 {
+                mat.base[i][j] = self.base[i][j] * rhs;
             }
         }
         mat

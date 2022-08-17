@@ -78,26 +78,30 @@ fn calucate_pixel(pixel: Pixel, scene: &Scene) -> (Pixel, Color) {
         (scene.intersect(ray), ray.direction())
     }).map(|(int,dir)|{
         intersect = int.clone();
+
         match int {
             None => Radiance::zero(),
-            Some(i) => scene.receive_radiance(i, dir.invert())
+            Some(i) => scene.receive_radiance(i, dir.invert(), true)
         }
     }).fold(Radiance::zero(), |acc,rad|{
         acc + rad
-    }) * (1.0/(settings.aa_multi_sample.pow(2)) as f64);
+    }) / settings.aa_multi_sample.pow(2) as f64;
 
     let color = match settings.render_mode {
         RenderMode::Default => radiance_color_map(rad, settings.gamma),
         RenderMode::Normals => normal_color_map(intersect),
-        RenderMode::Distance(factor) => distance_color_map(intersect, scene.camera().position(), factor),
+        RenderMode::Distance(factor) => distance_color_map(intersect, factor),
         RenderMode::BoundingBox => normal_color_map(intersect),
     };
     (pixel,color)
 }
 
 fn radiance_color_map(rad: Radiance, gamma: f64) -> Color{
-    let color = Color::from(rad);
-    color.gamma_correct(gamma).clamped_rgb()
+    let (r,g,b) = rad.color().rgb();
+    if r.is_nan() || g.is_nan() || b.is_nan() {
+        panic!("rgb value was NaN");
+    }
+    rad.color().gamma_correct(gamma).clamped_rgb()
 }
 
 fn normal_color_map(intersect: Option<Intersection>) -> Color{
@@ -110,11 +114,10 @@ fn normal_color_map(intersect: Option<Intersection>) -> Color{
     }
 }
 
-fn distance_color_map(intersect: Option<Intersection>, camera_position: Point, factor: f64) -> Color{
+fn distance_color_map(intersect: Option<Intersection>, factor: f64) -> Color{
     match intersect {
         None => Color::black(),
         Some(intersect) => {
-            //let distance = (intersect.point() - camera_position).length() / factor;
             let distance = intersect.t() / factor;
             Color::gray_scale(1.0/distance)
         }
