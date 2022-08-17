@@ -1,7 +1,7 @@
 
 use std::ops::{Add, Mul};
-use math::{Matrix,Vector};
-use settings;
+use crate::math::{Matrix,Vector};
+use crate::settings;
 
 #[derive(Copy, Clone)]
 pub enum WhiteReference {

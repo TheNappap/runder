@@ -1,10 +1,10 @@
 mod bvh;
 
-use cg_tools::{BoundingBox, Ray, Transformation};
-use math::{Point, Direction};
-use scene::Intersection;
-use objects::Instance;
-use settings;
+use crate::cg_tools::{BoundingBox, Ray, Transformation};
+use crate::math::{Point, Direction};
+use crate::scene::Intersection;
+use crate::objects::Instance;
+use crate::settings;
 
 #[derive(Copy, Clone, Debug)]
 pub enum AccelerationStructureKind {
@@ -18,7 +18,7 @@ pub trait AccelerationStructure : Send + Sync {
     fn bounding_box(&self, transformation: &Transformation) -> BoundingBox;
 }
 
-pub fn create_acceleration_structure(instances : Vec<Instance>) -> Box<AccelerationStructure> {
+pub fn create_acceleration_structure(instances : Vec<Instance>) -> Box<dyn AccelerationStructure> {
     match settings::get().acceleration_structure {
         AccelerationStructureKind::BruteForce => Box::new(BruteForce::new(instances)),
         AccelerationStructureKind::BVH => Box::new(bvh::BoundingVolumeHierarchy::new(instances)),

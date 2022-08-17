@@ -3,6 +3,7 @@ name = "rust_renderer"
 version = "0.1.0"
 build = "build.rs"
 authors = ["TheNappap <napoleonpapiertjes@gmail.com>"]
+edition = "2021"
 
 [dependencies.sdl2]
 version = "*"

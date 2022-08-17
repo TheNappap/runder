@@ -1,5 +1,5 @@
 
-use math::{Matrix, RotationAxis, Vector};
+use crate::math::{Matrix, RotationAxis, Vector};
 
 #[derive(Clone, Debug)]
 pub struct Transformation {

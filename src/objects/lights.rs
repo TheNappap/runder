@@ -1,13 +1,13 @@
 
 use std::f64::consts::PI;
 
-use math::{Normal, Point};
+use crate::math::{Normal, Point};
 use super::{Object, Rectangle};
-use cg_tools::{Color, Radiance, SamplingTechnique, Transformation};
+use crate::cg_tools::{Color, Radiance, SamplingTechnique, Transformation};
 
 pub trait Light : Send + Sync{
     fn light_points(&self, sampling_technique: SamplingTechnique) -> Vec<(Point,Option<Normal>)>;
-    fn radiance_from_point(&self, Point) -> Radiance;
+    fn radiance_from_point(&self, point: Point) -> Radiance;
 }
 
 pub struct PointLight {

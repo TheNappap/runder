@@ -1,19 +1,19 @@
 
-use math::{Point, Vector, Normal, EPSILON};
-use cg_tools::{Ray,Transformation,BoundingBox};
-use scene::Intersection;
-use objects::{Object,Material};
+use crate::math::{Point, Vector, Normal, EPSILON};
+use crate::cg_tools::{Ray,Transformation,BoundingBox};
+use crate::scene::Intersection;
+use crate::objects::{Object,Material};
 
 //////////////////
 //Sphere
 //////////////////
 #[derive(Debug)]
 pub struct Sphere {
-    material : Box<Material>
+    material : Box<dyn Material>
 }
 
 impl Sphere {
-    pub fn new(material: Box<Material>) -> Self{
+    pub fn new(material: Box<dyn Material>) -> Self{
         Sphere { material }
     }
 }
@@ -66,7 +66,7 @@ impl Object for Sphere {
         BoundingBox::new(min,max)
     }
 
-    fn material(&self) -> &Material {
+    fn material(&self) -> &dyn Material {
         self.material.as_ref()
     }
 }
@@ -79,11 +79,11 @@ pub struct Plane {
     point : Point,
     normal: Normal,
     double_sided: bool,
-    material : Box<Material>
+    material : Box<dyn Material>
 }
 
 impl Plane{
-    pub fn new(point : Point, normal: Normal, double_sided: bool, material: Box<Material>) -> Plane{
+    pub fn new(point : Point, normal: Normal, double_sided: bool, material: Box<dyn Material>) -> Plane{
         Plane{point, normal, double_sided, material}
     }
 
@@ -114,7 +114,7 @@ impl Object for Plane {
         BoundingBox::new(transform*Point::min_point(),transform*Point::max_point())
     }
 
-    fn material(&self) -> &Material { self.material.as_ref() }
+    fn material(&self) -> &dyn Material { self.material.as_ref() }
 }
 
 //////////////////
@@ -123,11 +123,11 @@ impl Object for Plane {
 #[derive(Debug)]
 pub struct BoxObject {
     bounds: BoundingBox,
-    material : Box<Material>
+    material : Box<dyn Material>
 }
 
 impl BoxObject{
-    pub fn new_from_origin(corner_point: Point, material: Box<Material>) -> BoxObject{
+    pub fn new_from_origin(corner_point: Point, material: Box<dyn Material>) -> BoxObject{
         let bounds = BoundingBox::new_from_origin(corner_point);
         BoxObject{bounds, material}
     }
@@ -145,5 +145,5 @@ impl Object for BoxObject {
         self.bounds.transformed(transformation)
     }
 
-    fn material(&self) -> &Material { self.material.as_ref() }
+    fn material(&self) -> &dyn Material { self.material.as_ref() }
 }

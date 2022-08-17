@@ -1,19 +1,19 @@
 
-use settings;
-use math::{Point, Direction, Normal, EPSILON};
-use cg_tools::{Ray,Transformation,Radiance};
-use objects::{Instance, Light, Material};
-use acceleration::{self, AccelerationStructure};
-use camera::PerspectiveCamera;
+use crate::settings;
+use crate::math::{Point, Direction, Normal, EPSILON};
+use crate::cg_tools::{Ray,Transformation,Radiance};
+use crate::objects::{Instance, Light, Material};
+use crate::acceleration::{self, AccelerationStructure};
+use crate::camera::PerspectiveCamera;
 
 pub struct Scene {
-    acc_structure: Box<AccelerationStructure>,
-    lights : Vec<Box<Light>>,
+    acc_structure: Box<dyn AccelerationStructure>,
+    lights : Vec<Box<dyn Light>>,
     camera: PerspectiveCamera
 }
 
 impl Scene {
-    pub fn new(instances : Vec<Instance>, lights : Vec<Box<Light>>, camera: PerspectiveCamera) -> Scene {
+    pub fn new(instances : Vec<Instance>, lights : Vec<Box<dyn Light>>, camera: PerspectiveCamera) -> Scene {
         let acc_structure = acceleration::create_acceleration_structure(instances);
         Scene {acc_structure, lights, camera}
     }
@@ -65,18 +65,18 @@ pub struct Intersection<'a>{
     t : f64,
     point : Point,
     normal : Normal,
-    material: &'a Material
+    material: &'a dyn Material
 }
 
 impl<'a> Intersection<'a>{
-    pub fn new(t : f64, point : Point, normal : Normal, material: &Material) -> Intersection{
+    pub fn new(t : f64, point : Point, normal : Normal, material: &dyn Material) -> Intersection{
         Intersection{t, point, normal, material}
     }
 
     pub fn t(&self) -> f64 { self.t }
     pub fn point(&self) -> Point { self.point }
     pub fn normal(&self) -> Normal { self.normal }
-    pub fn material(&self) -> &'a Material { self.material }
+    pub fn material(&self) -> &'a dyn Material { self.material }
 
     pub fn transform(mut self, transformation: &Transformation, ray: &Ray) -> Intersection<'a> {
         self.point = transformation.matrix()*self.point;

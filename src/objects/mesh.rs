@@ -1,20 +1,20 @@
 
 use super::{Face, Material, Object};
-use cg_tools::{BoundingBox, Transformation, Ray};
-use math::{Point};
-use scene::Intersection;
-use acceleration::{self, AccelerationStructure};
+use crate::cg_tools::{BoundingBox, Transformation, Ray};
+use crate::math::{Point};
+use crate::scene::Intersection;
+use crate::acceleration::{self, AccelerationStructure};
 
 //////////////////
 //Mesh
 //////////////////
 pub struct Mesh {
-    faces : Box<AccelerationStructure>,
-    material : Box<Material>
+    faces : Box<dyn AccelerationStructure>,
+    material : Box<dyn Material>
 }
 
 impl Mesh{
-    pub fn new(mut faces: Vec<Box<Face>>, material: Box<Material>) -> Mesh{
+    pub fn new(mut faces: Vec<Box<dyn Face>>, material: Box<dyn Material>) -> Mesh{
         let instances: Vec<_> = faces.drain(..).map(|a| {
             super::Instance::new(a.as_object())
         } ).collect();
@@ -32,5 +32,5 @@ impl Object for Mesh{
         self.faces.bounding_box(transformation)
     }
 
-    fn material(&self) -> &Material { self.material.as_ref() }
+    fn material(&self) -> &dyn Material { self.material.as_ref() }
 }

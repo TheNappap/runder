@@ -2,13 +2,13 @@
 use std::sync::Arc;
 
 use super::{Object, Material, Plane};
-use cg_tools::{Transformation, BoundingBox, Ray};
-use math::{Point, Normal, EPSILON};
-use scene::Intersection;
-use statistics;
+use crate::cg_tools::{Transformation, BoundingBox, Ray};
+use crate::math::{Point, Normal, EPSILON};
+use crate::scene::Intersection;
+use crate::statistics;
 
 pub trait Face : Object {
-    fn as_object(self: Box<Self>) -> Arc<Object>;
+    fn as_object(self: Box<Self>) -> Arc<dyn Object>;
     fn double_sided(&self) -> bool;
 }
 
@@ -19,11 +19,11 @@ pub trait Face : Object {
 pub struct Triangle {
     vertices : [Point; 3],
     double_sided: bool,
-    material : Box<Material>
+    material : Box<dyn Material>
 }
 
 impl Triangle{
-    pub fn new(vertices : [Point; 3], double_sided: bool, material: Box<Material>) -> Triangle{
+    pub fn new(vertices : [Point; 3], double_sided: bool, material: Box<dyn Material>) -> Triangle{
         Triangle{vertices, double_sided, material}
     }
 
@@ -63,7 +63,7 @@ impl Triangle{
 }
 
 impl Face for Triangle {
-    fn as_object(self: Box<Self>) -> Arc<Object> { Arc::new(*self) }
+    fn as_object(self: Box<Self>) -> Arc<dyn Object> { Arc::new(*self) }
 
     fn double_sided(&self) -> bool {
         self.double_sided
@@ -89,7 +89,7 @@ impl Object for Triangle{
         BoundingBox::new(min,max)
     }
 
-    fn material(&self) -> &Material { self.material.as_ref() }
+    fn material(&self) -> &dyn Material { self.material.as_ref() }
 }
 
 //////////////////
@@ -102,13 +102,13 @@ pub struct Rectangle {
 }
 
 impl Rectangle{
-    pub fn unit_square(double_sided: bool, material: Box<Material>) -> Rectangle{
+    pub fn unit_square(double_sided: bool, material: Box<dyn Material>) -> Rectangle{
         let points = [Point::origin(), Point::new(1.0,0.0, 0.0), Point::new(1.0,0.0, 1.0), Point::new(0.0,0.0, 1.0)];
         let plane= Plane::new(points[0], Normal::new(0.0, 1.0, 0.0), double_sided, material);
         Rectangle{ plane , points }
     }
 
-    pub fn new(points : [Point; 4], double_sided: bool, material: Box<Material>) -> Rectangle{
+    pub fn new(points : [Point; 4], double_sided: bool, material: Box<dyn Material>) -> Rectangle{
         let edge1 = points[1] - points[0];
         let edge2 = points[3] - points[0];
         let normal = Normal::from(edge1.cross(&edge2));
@@ -122,7 +122,7 @@ impl Rectangle{
 }
 
 impl Face for Rectangle {
-    fn as_object(self: Box<Self>) -> Arc<Object> { Arc::new(*self) }
+    fn as_object(self: Box<Self>) -> Arc<dyn Object> { Arc::new(*self) }
 
     fn double_sided(&self) -> bool {
         self.plane.double_sided()
@@ -153,5 +153,5 @@ impl Object for Rectangle {
         BoundingBox::new(min,max)
     }
 
-    fn material(&self) -> &Material { self.plane.material() }
+    fn material(&self) -> &dyn Material { self.plane.material() }
 }

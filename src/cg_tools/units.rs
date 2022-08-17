@@ -1,7 +1,7 @@
 
 use std::ops::{Add, Mul};
 use super::{Color,ColorModel};
-use settings;
+use crate::settings;
 
 //////////////////
 //Radiance

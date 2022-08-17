@@ -1,9 +1,9 @@
 
-use objects::Instance;
-use acceleration::AccelerationStructure;
-use cg_tools::{Ray, BoundingBox, Transformation};
-use math::{Point, Direction};
-use scene::Intersection;
+use crate::objects::Instance;
+use crate::acceleration::AccelerationStructure;
+use crate::cg_tools::{Ray, BoundingBox, Transformation};
+use crate::math::{Point, Direction};
+use crate::scene::Intersection;
 
 enum Axis {
     XAxis,

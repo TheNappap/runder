@@ -4,9 +4,9 @@ use self::itertools::iproduct;
 
 use std::f64::consts::{PI};
 
-use settings;
-use math::{Point, Direction};
-use cg_tools::Ray;
+use crate::settings;
+use crate::math::{Point, Direction};
+use crate::cg_tools::Ray;
 
 #[derive(Clone, Debug)]
 pub struct Pixel{

@@ -13,34 +13,34 @@ pub use self::obj_import::{parse_obj};
 pub use self::primitives::*;
 
 use std::sync::Arc;
-use math::Direction;
-use cg_tools::{Ray, Transformation, BoundingBox, Color};
-use scene::Intersection;
-use statistics;
-use settings;
+use crate::math::Direction;
+use crate::cg_tools::{Ray, Transformation, BoundingBox, Color};
+use crate::scene::Intersection;
+use crate::statistics;
+use crate::settings;
 
 //Object
 pub trait Object : Send + Sync {
     fn intersect(&self, ray: &Ray) -> Option<Intersection>;
     fn bounding_box(&self, transformation: &Transformation) -> BoundingBox;
-    fn material(&self) -> &Material;
+    fn material(&self) -> &dyn Material;
 }
 
 //Instance
 pub struct Instance {
-    object: Arc<Object>,
+    object: Arc<dyn Object>,
     transformation: Transformation,
     bbox: BoundingBox
 }
 
 impl Instance {
-    pub fn new(object: Arc<Object>) -> Instance {
+    pub fn new(object: Arc<dyn Object>) -> Instance {
         let transformation = Transformation::new();
         let bbox = object.bounding_box(&transformation);
         Instance{object, transformation, bbox}
     }
 
-    pub fn transformed(object: Arc<Object>, transformation: Transformation) -> Instance {
+    pub fn transformed(object: Arc<dyn Object>, transformation: Transformation) -> Instance {
         let bbox = object.bounding_box(&transformation);
         Instance{object, transformation, bbox}
     }
@@ -77,7 +77,7 @@ impl Instance {
         &self.bbox
     }
 
-    pub fn material(&self) -> &Material{
+    pub fn material(&self) -> &dyn Material{
         self.object.material()
     }
 }

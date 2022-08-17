@@ -2,8 +2,8 @@
 extern crate itertools;
 use self::itertools::iproduct;
 
-use::cg_tools::Transformation;
-use math::{Point, Direction, Normal, EPSILON};
+use super::Transformation;
+use crate::math::{Point, Direction, Normal, EPSILON};
 
 //////////////////
 //Ray

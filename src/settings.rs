@@ -1,7 +1,7 @@
 
-pub use cg_tools::{SamplingTechnique,ColorModel};
-pub use acceleration::AccelerationStructureKind;
-pub use renderer::RenderMode;
+pub use crate::cg_tools::{SamplingTechnique,ColorModel};
+pub use crate::acceleration::AccelerationStructureKind;
+pub use crate::renderer::RenderMode;
 
 #[derive(Clone)]
 pub struct Settings{

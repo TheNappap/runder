@@ -9,12 +9,12 @@ use std::time::{Instant};
 use std::sync::{mpsc, Arc};
 use std::sync::mpsc::{Sender};
 
-use settings;
-use thread_pool::{ThreadPool};
-use camera::{Pixel, PerspectiveCamera};
-use scene::{Scene, Intersection};
-use math::{Point};
-use cg_tools::{Color, Radiance};
+use crate::settings;
+use crate::thread_pool::{ThreadPool};
+use crate::camera::{Pixel, PerspectiveCamera};
+use crate::scene::{Scene, Intersection};
+use crate::math::{Point};
+use crate::cg_tools::{Color, Radiance};
 
 pub fn render(scene: Scene){
     let scene = Arc::new(scene);
@@ -27,7 +27,7 @@ enum ChunkFinished {
     Done
 }
 
-fn init_threads(chunks: &mut Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool, scene_graph: &Arc<Scene>, sender : &Sender<ChunkFinished>){
+fn init_threads(chunks: &mut dyn Iterator<Item=(u32,u32)>, thread_pool: &ThreadPool, scene_graph: &Arc<Scene>, sender : &Sender<ChunkFinished>){
     let settings = settings::get();
     let width = settings.screen_width;
     let height = settings.screen_height;

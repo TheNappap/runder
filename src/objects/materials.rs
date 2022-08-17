@@ -2,8 +2,8 @@
 use std::f64::consts::PI;
 use std::fmt::Debug;
 
-use math::Direction;
-use cg_tools::Color;
+use crate::math::Direction;
+use crate::cg_tools::Color;
 
 //////////////////
 //Material
