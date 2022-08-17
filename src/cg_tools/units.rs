@@ -1,5 +1,5 @@
 
-use std::ops::{Add, Mul};
+use std::ops::{Add, Mul, Div};
 use super::{Color,ColorModel};
 use crate::settings;
 
@@ -13,7 +13,10 @@ impl Radiance {
     pub fn zero() -> Radiance{
         Radiance(Color::black())
     }
+    pub fn new(r: f64,g: f64,b: f64) -> Radiance { Radiance(Color::new_rgb(r,g,b)) }
     pub fn gray_scale(rad:f64) -> Radiance { Radiance(Color::gray_scale(rad)) }
+
+    pub fn color(&self) -> Color { self.0 }
 }
 
 impl From<Color> for Radiance {
@@ -62,5 +65,21 @@ impl Mul<Radiance> for f64{
 
     fn mul(self, rhs: Radiance) -> Radiance {
         Radiance(self*rhs.0)
+    }
+}
+
+impl Div<f64> for Radiance{
+    type Output = Radiance;
+
+    fn div(self, rhs: f64) -> Radiance {
+        Radiance(self.0/rhs)
+    }
+}
+
+impl Div<Radiance> for f64{
+    type Output = Radiance;
+
+    fn div(self, rhs: Radiance) -> Radiance {
+        Radiance(self/rhs.0)
     }
 }

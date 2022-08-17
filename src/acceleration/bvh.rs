@@ -5,6 +5,7 @@ use crate::cg_tools::{Ray, BoundingBox, Transformation};
 use crate::math::{Point, Direction};
 use crate::scene::Intersection;
 
+#[derive(Copy,Clone)]
 enum Axis {
     XAxis,
     YAxis,
@@ -22,8 +23,8 @@ impl BVHNode {
     }
 
     fn composite(instances1: Vec<Instance>, instances2: Vec<Instance>, split_axis: Axis) -> BVHNode{
-        let bvh1 = BoundingVolumeHierarchy::new(instances1);
-        let bvh2 = BoundingVolumeHierarchy::new(instances2);
+        let bvh1 = BoundingVolumeHierarchy::new_with_split_axis(instances1, split_axis);
+        let bvh2 = BoundingVolumeHierarchy::new_with_split_axis(instances2, split_axis);
         BVHNode::Composite(Box::new(bvh1), Box::new(bvh2))
     }
 
@@ -53,12 +54,16 @@ pub struct BoundingVolumeHierarchy {
 impl BoundingVolumeHierarchy {
 
     pub fn new(instances: Vec<Instance>) -> BoundingVolumeHierarchy {
-        let root = BoundingVolumeHierarchy::split_instances(instances, &Axis::XAxis);
+        BoundingVolumeHierarchy::new_with_split_axis(instances, Axis::XAxis)
+    }
+
+    fn new_with_split_axis(instances: Vec<Instance>, split_axis: Axis) -> BoundingVolumeHierarchy {
+        let root = BoundingVolumeHierarchy::split_instances(instances, split_axis);
         let bbox = root.bounding_box(&Transformation::new());
         BoundingVolumeHierarchy{bbox, root}
     }
 
-    fn split_instances(mut instances: Vec<Instance>, split_axis: &Axis) -> BVHNode {
+    fn split_instances(mut instances: Vec<Instance>, split_axis: Axis) -> BVHNode {
         if instances.len() < 4 {
             return BVHNode::leaf(instances);
         }
@@ -80,7 +85,7 @@ impl BoundingVolumeHierarchy {
             (vec1,vec2)
         });
 
-        let next_split_axis = match *split_axis {
+        let next_split_axis = match split_axis {
             Axis::XAxis => Axis::YAxis,
             Axis::YAxis => Axis::ZAxis,
             Axis::ZAxis => Axis::XAxis,
@@ -103,9 +108,9 @@ impl BoundingVolumeHierarchy {
                     (None,Some(_)) => bvh2.intersect(ray),
                     (Some((t1,_,_)),Some((t2,_,_))) => {
                         let (first,second) = if t1 < t2 { (bvh1, bvh2) } else { (bvh2,bvh1) };
-                        let int1 = bvh1.intersect(ray);
+                        let int1 = first.intersect(ray);
                         if int1.is_some() && int1.unwrap().t() < t2 { return int1; }
-                        let int2 = bvh2.intersect(ray);
+                        let int2 = second.intersect(ray);
                         Intersection::closest_intersection(int1,int2)
                     }
                 }

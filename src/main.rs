@@ -27,7 +27,7 @@ fn main() {
         color_model: settings::ColorModel::RGB,
         acceleration_structure: settings::AccelerationStructureKind::BVH,
         amt_threads: 6,
-        aa_multi_sample: 1,
+        aa_multi_sample: 4,
         light_sampling_technique: settings::SamplingTechnique::Stratified{multi_sample: 4, seed: 0.0},
         ..settings::DEFAULT_SETTINGS
     };
@@ -57,20 +57,20 @@ fn default_scene() -> Scene {
         .scale(2.,1.,1.)
         .rotate(RotationAxis::Zaxis, FRAC_PI_4)
         .translate(Vector::new(2.,0.,4.))));
-    let sphere3 = Arc::new( Sphere::new(Box::new(Lambertian::new(Color::new_rgb(0.,1.,0.))) ) );
+    //let sphere3 = Arc::new( Sphere::new(Box::new(Lambertian::new(Color::new_rgb(0.,1.,0.))) ) );
     //instances.push(Instance::transformed( sphere3,Transformation::new()
     //    .translate(Vector::new(-2.,0.,4.))));
 
     let plane = Arc::new( Plane::new(Point::new(0.,-1.,0.), Normal::new(0.,1.,0.), false, Box::new(Lambertian::new(Color::gray_scale(1.))) ) );
     instances.push(Instance::new(plane));
-    let triangle = Arc::new( Triangle::new([Point::new(-1.,0.,2.),Point::new(-1.,1.,5.),Point::new(3.,0.,2.)], false,Box::new(Lambertian::new(Color::gray_scale(1.))) ) );
+    //let triangle = Arc::new( Triangle::new([Point::new(-1.,0.,2.),Point::new(-1.,1.,5.),Point::new(3.,0.,2.)], false,Box::new(Lambertian::new(Color::gray_scale(1.))) ) );
     //instances.push(Instance::new(triangle));
-    let rectangle= Arc::new( Rectangle::unit_square(true,Box::new(Lambertian::new(Color::gray_scale(1.))) ) );
+    //let rectangle= Arc::new( Rectangle::unit_square(true,Box::new(Lambertian::new(Color::gray_scale(1.))) ) );
     //instances.push(Instance::transformed(rectangle,Transformation::new()
     //    .scale_all(4.)
     //    .rotate(RotationAxis::Xaxis, -FRAC_PI_2)
     //    .translate(Vector::new(0.,-1.,6.))));
-    let box_object = Arc::new( BoxObject::new_from_origin(Point::new(1.,1.,1.),Box::new(Lambertian::new(Color::gray_scale(1.))) ) );
+    //let box_object = Arc::new( BoxObject::new_from_origin(Point::new(1.,1.,1.),Box::new(Lambertian::new(Color::gray_scale(1.))) ) );
     //instances.push(Instance::transformed(box_object,Transformation::new()
     //    .translate(Vector::new(-4.,2.,4.))));
 
@@ -82,7 +82,7 @@ fn default_scene() -> Scene {
 
     let mut lights: Vec<Box<dyn Light>> = Vec::new();
     let position = math::Point::new(-2.,2.,0.);
-    let position2 = math::Point::new(0.,8.,0.);
+    //let position2 = math::Point::new(0.,8.,0.);
     let surface = Rectangle::unit_square(false, Box::new(Lambertian::new(Color::gray_scale(1.))) );
     let transformation = Transformation::new()
         .rotate(RotationAxis::Xaxis, PI)
