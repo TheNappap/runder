@@ -2,6 +2,10 @@
 extern crate sdl2;
 extern crate itertools;
 
+use sdl2::pixels::PixelFormatEnum;
+use sdl2::render::SurfaceCanvas;
+use sdl2::surface::Surface;
+
 use self::itertools::iproduct;
 use std::iter::Iterator;
 use std::time::{Instant};
@@ -124,15 +128,18 @@ fn distance_color_map(intersect: Option<Intersection>, camera_position: Point, f
 fn run_program_loop(scene: Arc<Scene>){
     let settings = settings::get();
     let sdl_context = sdl2::init().unwrap();
-    let video_subsystem = sdl_context.video().unwrap();
 
-    let window = video_subsystem.window("rust renderer", settings.screen_width as u32, settings.screen_height as u32)
-        .position_centered()
-        .opengl()
-        .build()
-        .unwrap();
+    let surface = Surface::new(settings.screen_width as u32, settings.screen_height as u32, PixelFormatEnum::RGB888).unwrap();
+    let mut canvas = surface.into_canvas().unwrap();
 
-    let mut canvas = window.into_canvas().build().unwrap();
+    // let video_subsystem = sdl_context.video().unwrap();
+    // let window = video_subsystem.window("rust renderer", settings.screen_width as u32, settings.screen_height as u32)
+    //     .position_centered()
+    //     .opengl()
+    //     .build()
+    //     .unwrap();
+    // let mut canvas = window.into_canvas().build().unwrap();
+
     canvas.present();
 
     //START
@@ -157,6 +164,7 @@ fn run_program_loop(scene: Arc<Scene>){
                             println!("Done.");
                             println!("Elapsed time {}.{}s", elapsed.as_secs(), elapsed.subsec_millis());
                             super::statistics::print_statistics();
+                            quit = true;
                             break;
                         }
                     },
@@ -184,4 +192,7 @@ fn run_program_loop(scene: Arc<Scene>){
             }
         }
     }
+
+    std::fs::create_dir_all("img").unwrap();
+    canvas.surface().save_bmp("img/result_img.bmp").unwrap();
 }
